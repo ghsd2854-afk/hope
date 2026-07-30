@@ -8,7 +8,7 @@ import 'package:hobe/features/auth/model/login_model.dart';
 import 'package:hobe/features/auth/model/login_verify_otp_response_model.dart';
 import 'package:hobe/features/auth/model/register_response_model.dart';
 import 'package:hobe/features/auth/model/verify_otp_response_model.dart';
-
+import 'package:hobe/features/auth/model/resend_otp_response_model.dart';
 import 'package:hobe/features/auth/model/forgot_password_response_model.dart';
 import 'package:hobe/features/auth/model/verify_password_otp_response_model.dart';
 import 'package:hobe/features/auth/model/reset_password_response_model.dart';
@@ -17,6 +17,7 @@ class AuthService {
   final Dio _dio = DioService().dio;
 
   final box = GetStorage();
+  
 
   // ================= REGISTER =================
 
@@ -102,7 +103,26 @@ print(response.data);
   }
 
   // ================= LOGIN OTP =================
+Future<ResendOtpResponseModel> resendOtp({
+  required String email,
+}) async {
+  try {
+    final response = await _dio.post(
+      ApiConstants.resendOtp,
+      data: FormData.fromMap({
+        "email": email,
+      }),
+    );
 
+    return ResendOtpResponseModel.fromJson(response.data);
+
+  } on DioException catch (e) {
+    throw Exception(
+      e.response?.data["message"] ??
+          "Resend OTP failed",
+    );
+  }
+}
   Future<LoginVerifyOtpResponseModel>
       verifyLoginOtp({
     required String email,
@@ -116,7 +136,7 @@ print(response.data);
           "otp": otp,
         }),
       );
-
+print("LOGIN OTP RESPONSE => ${response.data}"); 
       return LoginVerifyOtpResponseModel
           .fromJson(response.data);
     } on DioException catch (e) {
@@ -191,6 +211,23 @@ print(response.data);
             "OTP verification failed",
       );
     }
+  }
+
+
+
+
+  Future<void> logout() async {
+    final token = box.read("token");
+
+    await _dio.post(
+      ApiConstants.logout,
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      ),
+    );
   }
 
   // ================= RESET PASSWORD =================

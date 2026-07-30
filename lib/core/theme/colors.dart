@@ -1,46 +1,24 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // الألوان الأساسية (البنفسجي)
-  static const Color primaryStart = Color(0xFFC9B8EC); // بنفسجي فاتح
-  static const Color primaryEnd = Color.fromARGB(
-    255,
-    148,
-    114,
-    217,
-  ); // اللون البنفسجي الرئيسي
-  static const Color Selection = Color(0xFF4A148C);
-  static const Color backgroundColor = Color.fromARGB(255, 218, 203, 248);
-  // static const Color degreecolor = Color.fromARGB(255, 148, 114, 217);
+  // Gradient (مشترك)
+  static const Color primaryStart = Color(0xFF2DD4BF);
+  static const Color primaryEnd = Color(0xFF0891B2);
 
-  // DARK THEME
-  static const Color darkBackground = Color(
-    0xFF0D0C11,
-  ); // خلفية داكنة جداً وأنيقة
-  static const Color darkCard = Color(0xFF1B1A21); // كرت داكن متباين
+  // DARK
+  static const Color darkBackground = Color(0xFF0B1E26);
+  static const Color darkCard = Color(0xFF102A33);
 
-  // LIGHT THEME
-  static const Color lightBackground = Color(
-    0xFFF9F9FC,
-  ); // رمادي فاتح جداً (خلفية)
-  static const Color lightCard = Colors.white; // كرت أبيض نقي
+  // LIGHT
+  static const Color lightBackground = Color(0xFFF8FAFC);
+  static const Color lightCard = Colors.white;
 
-  // TEXT
+  // Text
   static const Color textDarkPrimary = Colors.white;
-  static const Color textLightPrimary = Color(0xFF2D2D2D); // رمادي داكن للنصوص
-  static const Color textSecondary = Color(0xFF8E8E93); // رمادي للنصوص الفرعية
+  static const Color textLightPrimary = Color(0xFF0F172A);
 
-  // BORDERS
-  static const Color border = Color(0xFFE5E5EA);
-}
+  static const Color textSecondary = Color(0xFF64748B);
 
-extension GradientExtension on AppColors {
-  static const LinearGradient purpleGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [
-      AppColors.primaryStart, // اللون الفاتح
-      AppColors.primaryEnd, // اللون الغامق
-    ],
-  );
+  // Borders
+  static const Color border = Color(0xFFE2E8F0);
 }

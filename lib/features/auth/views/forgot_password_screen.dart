@@ -2,105 +2,297 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:hobe/features/auth/controllers/forget_password_controller.dart';
-
-
-import '../../../core/theme/colors.dart';
-
-
-
-
 import 'package:hobe/features/auth/widgets/custum_input.dart';
 import 'package:hobe/features/auth/widgets/gradient_button.dart';
-
-
-
-import '../../auth/views/login_screen.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   ForgotPasswordScreen({super.key});
 
-  final controller = Get.put(ForgotPasswordController());
+  final controller =
+      Get.put(ForgotPasswordController());
+@override
+Widget build(BuildContext context) {
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.lightBackground,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+  return Scaffold(
 
-              const SizedBox(height: 20),
+    body: Container(
 
-              /// 🔙 Back
-              IconButton(
-                onPressed: () => Get.back(),
-                icon: const Icon(Icons.arrow_back),
-              ),
+      width: double.infinity,
 
-              const SizedBox(height: 10),
+      decoration: const BoxDecoration(
 
-              /// Title
-              const Text(
-                "Forgot Password",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-               //   color: AppColors.textPrimary,
+        gradient: LinearGradient(
+
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+
+          colors: [
+
+            Color(0xFFDCCBFF),
+            Color(0xFFF8F7FF),
+
+          ],
+        ),
+      ),
+
+      child: SafeArea(
+
+        child: SingleChildScrollView(
+
+          child: Padding(
+
+            padding: const EdgeInsets.symmetric(
+              horizontal: 24,
+            ),
+
+            child: Column(
+
+              children: [
+
+                const SizedBox(
+                  height: 60,
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const Text(
 
-              /// Description
-              const Text(
-                "Enter your email to receive a password reset link.",
-                style: TextStyle(
-                  color: AppColors.textSecondary,
+                  "HOPE",
+
+                  style: TextStyle(
+
+                    color:
+                        Color(0xFF8B5CF6),
+
+                    fontSize: 34,
+
+                    fontWeight:
+                        FontWeight.bold,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 30),
+                const SizedBox(
+                  height: 80,
+                ),
 
-              /// Email Input
-              CustomInput(
-                hint: "Email",
-                icon: Icons.email_outlined,
-                controller: controller.emailController,
-              ),
+                /// CARD
 
-              const SizedBox(height: 25),
+                Container(
 
-              /// Button
-              Obx(() => GradientButton(
-                    text: "Send Reset Link",
-                    loading: controller.isLoading.value,
-                onTap: controller.sendResetLink,
-                  )),
+                  padding:
+                      const EdgeInsets.all(
+                    20,
+                  ),
 
-              const SizedBox(height: 20),
+                  decoration:
+                      BoxDecoration(
 
-              /// Return to Login
-              Center(
-                child: TextButton(
-                  onPressed: () {
-                    Get.offAll(() => LoginScreen());
-                  },
-                  child: const Text(
-                    "Return to Login",
-                    style: TextStyle(
-                      color: AppColors.primaryStart,
-                      fontWeight: FontWeight.w500,
+                    color: Colors.white,
+
+                    borderRadius:
+                        BorderRadius.circular(
+                      20,
+                    ),
+
+                    boxShadow: const [
+
+                      BoxShadow(
+
+                        color:
+                            Colors.black12,
+
+                        blurRadius: 12,
+
+                        offset:
+                            Offset(0, 4),
+                      ),
+                    ],
+                  ),
+
+                  child: Column(
+
+                    crossAxisAlignment:
+                        CrossAxisAlignment
+                            .start,
+
+                    children: [
+
+                      const Center(
+
+                        child: Text(
+
+                          "Forgot Password",
+
+                          style: TextStyle(
+
+                            fontSize: 28,
+
+                            fontWeight:
+                                FontWeight.bold,
+
+                            color: Color(
+                              0xFF7C3AED,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 30,
+                      ),
+
+                      const Text(
+
+                        "Email",
+
+                        style: TextStyle(
+
+                          fontSize: 18,
+
+                          fontWeight:
+                              FontWeight.w500,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 10,
+                      ),
+
+                      CustomInput(
+
+                        hint:
+                            "mail@example.com",
+
+                        icon: Icons
+                            .email_outlined,
+
+                        controller:
+                            controller
+                                .emailController,
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(
+                  height: 35,
+                ),
+
+                /// BUTTON
+
+                Obx(
+
+                  () => Container(
+
+                    width:
+                        double.infinity,
+
+                    height: 55,
+
+                    decoration:
+                        BoxDecoration(
+
+                      borderRadius:
+                          BorderRadius
+                              .circular(
+                        12,
+                      ),
+
+                      gradient:
+                          const LinearGradient(
+
+                        colors: [
+
+                          Color(
+                              0xFF9F67FF),
+
+                          Color(
+                              0xFF7C3AED),
+
+                        ],
+                      ),
+                    ),
+
+                    child: Material(
+
+                      color:
+                          Colors.transparent,
+
+                      child: InkWell(
+
+                        borderRadius:
+                            BorderRadius
+                                .circular(
+                          12,
+                        ),
+
+                        onTap: controller
+                            .sendResetLink,
+
+                        child: Center(
+
+                          child: controller
+                                  .isLoading
+                                  .value
+                              ? const CircularProgressIndicator(
+                                  color:
+                                      Colors.white,
+                                )
+                              : const Text(
+
+                                  "Send OTP",
+
+                                  style:
+                                      TextStyle(
+
+                                    color:
+                                        Colors
+                                            .white,
+
+                                    fontSize:
+                                        18,
+
+                                    fontWeight:
+                                        FontWeight
+                                            .bold,
+                                  ),
+                                ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+
+                const SizedBox(
+                  height: 25,
+                ),
+
+                TextButton(
+
+                  onPressed: () {
+                    Get.back();
+                  },
+
+                  child: const Text(
+
+                    "Back to Login",
+
+                    style: TextStyle(
+
+                      color:
+                          Color(0xFF7C3AED),
+
+                      fontSize: 16,
+
+                      fontWeight:
+                          FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

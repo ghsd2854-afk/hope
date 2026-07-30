@@ -35,15 +35,19 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   get: ^4.7.3
-  flutter_svg: ^2.2.4
+  flutter_svg: ^2.3.0
   lottie: ^3.3.3
   shared_preferences: ^2.5.5
   get_storage: ^2.1.1
   image_picker: ^1.2.2
   dio: ^5.9.2
+  syncfusion_flutter_pdfviewer: ^33.2.13
+  file_picker: ^10.3.2
+  path_provider: ^2.1.6
+  google_fonts: ^8.1.0
   easy_debounce: ^2.0.3
-  pretty_dio_logger: ^1.4.0
   curved_navigation_bar: ^1.0.6
+  pretty_dio_logger: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -71,7 +75,8 @@ flutter:
 
   assets:
     - assets/photo_2026-04-28_17-44-40.jpg
-     
+    - assets/photo_2026-06-18_12-28-37.jpg
+    - assets/ChatGPT Image Jul 14, 2026, 12_13_38 PM.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

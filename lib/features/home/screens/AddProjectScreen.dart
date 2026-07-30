@@ -22,6 +22,7 @@ class AddProjectScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             TextFormField(
+              controller: controller.summaryController,
               decoration: InputDecoration(
                 labelText: "ملخص قصير",
                 border: OutlineInputBorder(),
@@ -37,12 +38,24 @@ class AddProjectScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            DropdownButtonFormField(
-              items: [
-                'تكنولوجيا',
-                'بيئة',
-                'خدمات',
-              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            DropdownButtonFormField<String>(
+              value: controller.selectedCategory.value.isNotEmpty
+                  ? controller.selectedCategory.value
+                  : null,
+              items: ['tech', 'environment', 'services']
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        e == 'tech'
+                            ? 'تكنولوجيا'
+                            : e == 'environment'
+                            ? 'بيئة'
+                            : 'خدمات',
+                      ),
+                    ),
+                  )
+                  .toList(),
               onChanged: (val) =>
                   controller.selectedCategory.value = val.toString(),
               decoration: InputDecoration(
@@ -52,12 +65,24 @@ class AddProjectScreen extends StatelessWidget {
             ),
             SizedBox(height: 10),
             // حقل المرحلة الجديد
-            DropdownButtonFormField(
-              items: [
-                'فكرة',
-                'تطوير',
-                'إطلاق',
-              ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+            DropdownButtonFormField<String>(
+              value: controller.selectedStage.value.isNotEmpty
+                  ? controller.selectedStage.value
+                  : null,
+              items: ['idea', 'development', 'launch']
+                  .map(
+                    (e) => DropdownMenuItem(
+                      value: e,
+                      child: Text(
+                        e == 'idea'
+                            ? 'فكرة'
+                            : e == 'development'
+                            ? 'تطوير'
+                            : 'إطلاق',
+                      ),
+                    ),
+                  )
+                  .toList(),
               onChanged: (val) =>
                   controller.selectedStage.value = val.toString(),
               decoration: InputDecoration(
@@ -66,11 +91,30 @@ class AddProjectScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: 10),
-            // حقل هدف التمويل الجديد
+            // حقل هدف التمويل الجديد (يُفضّل أن يكون رقمياً)
             TextFormField(
               controller: controller.fundingGoalController,
+              keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: "هدف التمويل",
+                labelText: "هدف التمويل (أرقام فقط)",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            // حقل الموقع
+            TextFormField(
+              controller: controller.locationController,
+              decoration: InputDecoration(
+                labelText: "الموقع",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            // حقل الرابط (يُفضّل أن يكون رابطاً صحيحاً مثل https://...)
+            TextFormField(
+              controller: controller.websiteUrlController,
+              decoration: InputDecoration(
+                labelText: "رابط الموقع الإلكتروني",
                 border: OutlineInputBorder(),
               ),
             ),

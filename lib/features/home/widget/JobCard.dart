@@ -3,11 +3,16 @@ import 'package:get/get.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/JobController.dart';
 import 'package:hobe/features/Icons_home/controller/ReactionController.dart';
+
 import 'package:hobe/features/Icons_home/controller/comment_controller.dart';
 import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
 import 'package:hobe/features/Icons_home/screen/ReactionButton.dart';
 import 'package:hobe/features/Icons_home/screen/ReactionListScreen.dart';
+
 import 'package:hobe/features/Icons_home/screen/comment_screen.dart';
+
+// ⚠️ عدّل هذا المسار حسب مكان block_controller.dart الفعلي عندك
+import 'package:hobe/features/home/controllers/block_controller.dart';
 
 class JobCard extends StatelessWidget {
   final JobPostModel job;
@@ -40,7 +45,7 @@ class JobCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1️⃣ الجزء العلوي: الأيقونة + (اسم الشركة + العنوان + الموقع) + المتابعة
+            // 1️⃣ الجزء العلوي: الأيقونة + (اسم الشركة + العنوان + الموقع) + المتابعة + حظر
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -116,6 +121,28 @@ class JobCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // ⛔ زر حظر الشركة
+                if (job.company != null)
+                  PopupMenuButton<String>(
+                    icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+                    onSelected: (value) {
+                      if (value == 'block') {
+                        _confirmBlock(context);
+                      }
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'block',
+                        child: Row(
+                          children: [
+                            Icon(Icons.block, size: 18, color: Colors.red),
+                            SizedBox(width: 8),
+                            Text('حظر الشركة'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
             const SizedBox(height: 16),
@@ -242,6 +269,40 @@ class JobCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _confirmBlock(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('حظر الشركة'),
+        content: Text(
+          'لن تظهر لك منشورات "${job.company!.companyName}" بعد الحظر. هل تريد المتابعة؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('تراجع'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              final blockController = Get.isRegistered<BlockController>()
+                  ? Get.find<BlockController>()
+                  : Get.put(BlockController());
+
+              // ⚠️ عدّل company!.id إذا كان اسم الحقل مختلف بموديل الشركة عندك
+              blockController.blockEntity(
+                type: 'company',
+                id: job.company!.id,
+                name: job.company!.companyName,
+              );
+            },
+            child: const Text('حظر', style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }

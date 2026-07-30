@@ -7,12 +7,39 @@ abstract class AppRoutes {
 
   static const otp = '/otp';
 
-  static const home = '/home';
-
   // Forgot Password
   static const forgotPassword = '/forgot-password';
 
   static const resetPassword = '/reset-password';
   static const profile = '/profile';
+  static const skills = "/skills";
+  static const training = "/training";
+  static const education = "/education";
+  static const experiences = "/experiences";
+  static const projects = "/projects";
+  static const certification = "/certification";
+  static const interests = "/interests";
+  static const skillSuggestions = "/skillSuggestions";
+  static const cvGenerate = "/cvGenerate";
+  static const analyze = "/analyze";
+  static const enhance = "/enhance";
+  static const MATCH = '/match';
+  static const pdf = '/pdf';
+  static const cvUpload = "/cv-upload";
+  static const cvFilesList = "/cv-files";
+  static const cvHub = "/cv-hub";
+  static const cvFileDetails = "/cv-file-details";
+  static const cvAnalyzeFile = "/cv-analyze-file";
+  static const cvEnhanceFile = "/cv-enhance-file";
+  static const profilecompletion = "/profile-completion";
+  static const publicprofilesettings = "/public-profile-settings";
+  static const publicprofilepreview = "/public-profile-preview";
+  static const myAccount = '/my-account';
+  static const onboarding = "/onboarding";
+  static const String Settings = '/settings';
+  static const home = '/home';
   static const savedJobs = '/saved-jobs';
+  static const String BLOCKED_LIST = '/blocked-list';
+  static const String DATA_EXPORT = '/data-export';
+  static const String CONVERSATIONS_LIST = '/conversations-list';
 }

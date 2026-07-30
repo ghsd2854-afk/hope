@@ -20,19 +20,22 @@ class GradientButton extends StatelessWidget {
       onTap: loading ? null : onTap,
       child: Container(
         height: 55,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: const LinearGradient(
-            colors: [AppColors.primaryStart, AppColors.primaryEnd],
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primaryStart.withOpacity(0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            )
-          ],
-        ),
+    decoration: BoxDecoration(
+  borderRadius: BorderRadius.circular(16),
+  gradient: const LinearGradient(
+    colors: [
+      Color(0xFF7C3AED),
+      Color(0xFF7C3AED),
+    ],
+  ),
+  boxShadow: [
+    BoxShadow(
+      color: Color(0xFF7C3AED).withOpacity(0.3),
+      blurRadius: 10,
+      offset: const Offset(0, 5),
+    ),
+  ],
+),
         child: Center(
           child: loading
               ? const CircularProgressIndicator(color: Colors.white)

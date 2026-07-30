@@ -17,21 +17,45 @@ final AuthService _authService = AuthService();
   void togglePassword() => hidePassword.value = !hidePassword.value;
   void toggleConfirm() => hideConfirm.value = !hideConfirm.value;
 
-  String? validate() {
-    if (nameController.text.isEmpty) {
-      return "Name is required";
-    }
-    if (emailController.text.isEmpty) {
-      return "Email is required";
-    }
-    if (passwordController.text.length < 6) {
-      return "Password must be at least 6 characters";
-    }
-    if (passwordController.text != confirmController.text) {
-      return "Passwords do not match";
-    }
-    return null;
+ String? validate() {
+
+  if (nameController.text.trim().isEmpty) {
+    return "Name is required";
   }
+
+  if (nameController.text.trim().length < 3) {
+    return "Name must be at least 3 characters";
+  }
+
+  if (emailController.text.trim().isEmpty) {
+    return "Email is required";
+  }
+
+  if (!GetUtils.isEmail(
+    emailController.text.trim(),
+  )) {
+    return "Invalid email format";
+  }
+
+  if (passwordController.text.isEmpty) {
+    return "Password is required";
+  }
+
+  if (passwordController.text.length < 6) {
+    return "Password must be at least 6 characters";
+  }
+
+  if (confirmController.text.isEmpty) {
+    return "Confirm password is required";
+  }
+
+  if (passwordController.text !=
+      confirmController.text) {
+    return "Passwords do not match";
+  }
+
+  return null;
+}
 
 
 

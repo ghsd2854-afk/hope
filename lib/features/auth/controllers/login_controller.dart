@@ -15,21 +15,9 @@ final AuthService _authService =
     isPasswordHidden.value = !isPasswordHidden.value;
   }
 
- Future<void> login() async {
+Future<void> login() async {
 
-  if (emailController.text.isEmpty) {
-    Get.snackbar(
-      "Error",
-      "Email is required",
-    );
-    return;
-  }
-
-  if (passwordController.text.isEmpty) {
-    Get.snackbar(
-      "Error",
-      "Password is required",
-    );
+  if (!validateLogin()) {
     return;
   }
 
@@ -37,6 +25,7 @@ final AuthService _authService =
 
     isLoading.value = true;
 
+    
     final response =
         await _authService.login(
       email: emailController.text.trim(),
@@ -72,6 +61,52 @@ print("MESSAGE = ${response.message}");
     isLoading.value = false;
 
   }
+}
+bool validateLogin() {
+
+  if (emailController.text.trim().isEmpty) {
+
+    Get.snackbar(
+      "Error",
+      "Email is required",
+    );
+
+    return false;
+  }
+
+  if (!GetUtils.isEmail(
+    emailController.text.trim(),
+  )) {
+
+    Get.snackbar(
+      "Error",
+      "Invalid email format",
+    );
+
+    return false;
+  }
+
+  if (passwordController.text.isEmpty) {
+
+    Get.snackbar(
+      "Error",
+      "Password is required",
+    );
+
+    return false;
+  }
+
+  if (passwordController.text.length < 6) {
+
+    Get.snackbar(
+      "Error",
+      "Password must be at least 6 characters",
+    );
+
+    return false;
+  }
+
+  return true;
 }
 
   @override
