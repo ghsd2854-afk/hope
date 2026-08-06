@@ -146,4 +146,19 @@ class ApiConstants {
   static const String exportStatus = "/account/export/status";
   static String downloadExport(int id) => "/account/export/$id/download";
   static const String conversations = "/conversations";
+  static const String activityReactions = "/activities/reactions";
+  static const String activityComments = "/activities/comments";
+  static const String activityViews = "/activities/views";
+  static String updateStartupProject(int id) => "/startup-projects/$id/update";
+  static const String complaintReport = "/complaint-reports";
+  static const String Report = "/reports";
+  static const String jobAlerts = "/job-alerts";
+  static String jobDetails(int id) => "/jobs/$id";
+  static String inviteCompaniesToProject(int projectId) =>
+      "/startup-projects/$projectId/invite";
+  static String deleteStartupProject(int id) => '/startup-projects/$id';
+  static String startupProjectDetails(int id) => '/startup-projects/$id';
+  static String companyReviews(int companyId) =>
+      "/companies/$companyId/reviews";
+  static const String myApplications = "/my-applications";
 }

@@ -6,6 +6,8 @@ import 'package:hobe/core/theme/theme_controller.dart';
 import 'package:hobe/features/auth/services/auth_services.dart';
 import 'package:hobe/features/profiles/controller/profile_controller.dart';
 import 'package:hobe/features/profiles/view/profile_screen.dart';
+// استيراد شاشة التنبيهات
+import 'package:hobe/features/home/screens/JobAlertsScreen.dart';
 
 import '../../../core/theme/colors.dart';
 
@@ -15,32 +17,32 @@ class HomeDrawer extends StatelessWidget {
   final themeController = Get.find<ThemeController>();
   final box = GetStorage();
 
-final AuthService _authService = AuthService();
+  final AuthService _authService = AuthService();
 
-void _logout() {
-  Get.defaultDialog(
-    title: "تسجيل الخروج",
-    middleText: "هل أنت متأكد من تسجيل الخروج؟",
-    textConfirm: "خروج",
-    textCancel: "إلغاء",
-    confirmTextColor: Colors.white,
-    onConfirm: () async {
-      try {
-        await _authService.logout();
-      } catch (e) {
-        print(e);
-      }
+  void _logout() {
+    Get.defaultDialog(
+      title: "تسجيل الخروج",
+      middleText: "هل أنت متأكد من تسجيل الخروج؟",
+      textConfirm: "خروج",
+      textCancel: "إلغاء",
+      confirmTextColor: Colors.white,
+      onConfirm: () async {
+        try {
+          await _authService.logout();
+        } catch (e) {
+          print(e);
+        }
 
-      await box.erase();
+        await box.erase();
 
-      if (Get.isRegistered<ProfileController>()) {
-        Get.delete<ProfileController>(force: true);
-      }
+        if (Get.isRegistered<ProfileController>()) {
+          Get.delete<ProfileController>(force: true);
+        }
 
-      Get.offAllNamed(AppRoutes.login);
-    },
-  );
-}
+        Get.offAllNamed(AppRoutes.login);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +57,7 @@ void _logout() {
             padding: const EdgeInsets.all(20),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  AppColors.primaryStart,
-                  AppColors.primaryEnd,
-                ],
+                colors: [AppColors.primaryStart, AppColors.primaryEnd],
               ),
             ),
             child: Column(
@@ -80,10 +79,7 @@ void _logout() {
                 if (userEmail.toString().isNotEmpty)
                   Text(
                     userEmail,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
               ],
             ),
@@ -101,13 +97,13 @@ void _logout() {
               ),
             ),
           ),
-          
-  ListTile(
-            leading: Icon(Icons.chat),
-            title: Text("chat"),
+
+          ListTile(
+            leading: const Icon(Icons.chat),
+            title: const Text("chat"),
             onTap: () => Get.toNamed(AppRoutes.CONVERSATIONS_LIST),
-          ), 
-         
+          ),
+
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text("profile"),
@@ -116,22 +112,37 @@ void _logout() {
               Get.to(() => ProfileEditScreen());
             },
           ),
-            
-  ListTile(
-            leading: const Icon(Icons.bookmark_outline), // أيقونة المحفوظات
+
+          ListTile(
+            leading: const Icon(Icons.bookmark_outline),
             title: const Text("Saved"),
             onTap: () {
-              Get.back(); // لإغلاق الـ Drawer
-              Get.toNamed(AppRoutes.savedJobs); // الانتقال للصفحة الجديدة
+              Get.back();
+              Get.toNamed(AppRoutes.savedJobs);
             },
           ),
-           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text("الإعدادات"),
-            onTap: () => Get.toNamed(AppRoutes.Settings),
+          ListTile(
+            leading: const Icon(Icons.assignment_outlined),
+            title: const Text("My Activites"),
+            onTap: () {
+              Get.back(); // لإغلاق الـ Drawer أولاً
+              Get.toNamed(AppRoutes.myActivities);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.notifications_active_outlined),
+            title: const Text("تنبيهاتي"),
+            onTap: () {
+              Get.back();
+              Get.to(() => JobAlertsScreen());
+            },
           ),
 
-     
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text("الإعدادات"),
+            onTap: () => Get.toNamed(AppRoutes.Settings),
+          ),
 
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
@@ -144,8 +155,6 @@ void _logout() {
               _logout();
             },
           ),
-            
-          
         ],
       ),
     );

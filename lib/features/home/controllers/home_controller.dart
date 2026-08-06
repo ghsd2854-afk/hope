@@ -2,13 +2,16 @@ import 'package:get/get.dart';
 import 'package:hobe/features/APIS/api_constants.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
 import 'package:hobe/features/Icons_home/models/CategoryModel.dart';
+import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
 import 'package:hobe/features/Icons_home/models/post_model.dart';
+import 'package:hobe/features/home/models/ActivityModel.dart';
 
 class HomeController extends GetxController {
   var selectedFilter = 0.obs;
-  var currentIndex = 0.obs;
+  var currentIndex = 1.obs;
   var isLoading = false.obs;
   var categories = <CategoryModel>[].obs;
+  int? currentCategoryId;
 
   var posts = <PostModel>[
     PostModel(
@@ -17,30 +20,77 @@ class HomeController extends GetxController {
       desc: "Looking for marketing expert",
     ),
   ].obs;
+  var detailsList = <ActivityModel>[].obs;
+  var currentTitle = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
-
-    fetchCategories(); // تأكدي أن هذا السطر موجود ويعمل!
+    //  fetchCategories();
+    fetchCategories();
   }
 
   Future<void> fetchCategories() async {
     try {
       isLoading.value = true;
-      final response = await DioService().dio.get(
-        ApiConstants.getCategories,
-        queryParameters: {'type': 'job_type'},
-      );
+
+      // قمنا بإزالة queryParameters لجلب كل الفئات بكل أنواعها (job_type, sector, project_type...)
+      final response = await DioService().dio.get(ApiConstants.getCategories);
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['data'];
         categories.value = data
             .map((json) => CategoryModel.fromJson(json))
             .toList();
+
+        // [اختياري] هنا يمكنك تنفيذ دالة التجميع (Grouping) إذا كنتِ تريدين تقسيمها فور وصولها
       }
     } catch (e) {
       Get.snackbar("خطأ", "فشل جلب الفئات");
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  // متغير لتخزين الوظائف الخاصة بالفئة المحددة
+  var selectedCategoryJobs = <JobPostModel>[].obs;
+  var isJobsLoading = false.obs;
+
+  // دوال جلب النشاطات الثلاثة
+  Future<void> fetchReactions() async {
+    currentTitle.value = "التفاعلات";
+    await _fetchActivities(ApiConstants.activityReactions);
+  }
+
+  Future<void> fetchComments() async {
+    currentTitle.value = "التعليقات";
+    await _fetchActivities(ApiConstants.activityComments);
+  }
+
+  Future<void> fetchViews() async {
+    currentTitle.value = "المشاهدات";
+    await _fetchActivities(ApiConstants.activityViews);
+  }
+
+  Future<void> _fetchActivities(String endpoint) async {
+    try {
+      isLoading.value = true;
+      detailsList.clear();
+
+      final response = await DioService().dio.get(endpoint);
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data is List
+            ? response.data
+            : response.data['data'];
+
+        // استخدام ActivityModel.fromJson لحل المشكلة تماماً
+        detailsList.value = data
+            .map((json) => ActivityModel.fromJson(json))
+            .toList();
+      }
+    } catch (e) {
+      Get.snackbar("خطأ", "فشل في جلب البيانات: $e");
     } finally {
       isLoading.value = false;
     }

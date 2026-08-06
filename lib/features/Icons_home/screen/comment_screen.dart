@@ -6,6 +6,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/comment_controller.dart';
 import 'package:hobe/features/Icons_home/models/comment_model.dart';
+import 'package:hobe/features/Icons_home/screen/ReportDialog.dart';
 
 class CommentBottomSheet extends StatelessWidget {
   final int postId;
@@ -85,7 +86,6 @@ class CommentBottomSheet extends StatelessWidget {
                             ),
                           ),
 
-                        // التصحيح هنا: استخدام .value بدلاً من .sentToStream
                         if (comment.isExpanded.value &&
                             comment.replies.isNotEmpty)
                           ...comment.replies
@@ -166,6 +166,17 @@ class CommentBottomSheet extends StatelessWidget {
                         () => _showEditOrReplyDialog(comment, isEdit: true),
                       ),
                       const SizedBox(width: 10),
+                      // 🚨 زر الإبلاغ عن التعليق (بجانب التعديل)
+                      _buildActionText("إبلاغ", () {
+                        showDialog(
+                          context: context,
+                          builder: (context) => ReportDialog(
+                            reportableType: 'comment',
+                            reportableId: comment.id,
+                          ),
+                        );
+                      }, isReport: true),
+                      const SizedBox(width: 10),
                       _buildActionText(
                         "رد",
                         () => _showEditOrReplyDialog(comment, isEdit: false),
@@ -177,7 +188,6 @@ class CommentBottomSheet extends StatelessWidget {
                         isDelete: true,
                       ),
                       const SizedBox(width: 10),
-                      // هنا يظهر الزر في الواجهة
                       _buildReactionButton(comment),
                     ],
                   ),
@@ -194,7 +204,6 @@ class CommentBottomSheet extends StatelessWidget {
     return Obx(
       () => InkWell(
         onTap: () {
-          // منطق التفاعل: إذا كان متفاعلاً، يحذف التفاعل، وإلا يضيفه
           if (comment.isReacted.value) {
             controller.deleteReactionFromComment(
               comment.id,
@@ -209,7 +218,6 @@ class CommentBottomSheet extends StatelessWidget {
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,
-            // يتغير اللون تلقائياً بفضل Obx
             color: comment.isReacted.value
                 ? Colors.red
                 : AppColors.textSecondary,
@@ -223,6 +231,7 @@ class CommentBottomSheet extends StatelessWidget {
     String label,
     VoidCallback onTap, {
     bool isDelete = false,
+    bool isReport = false,
   }) {
     return InkWell(
       onTap: onTap,
@@ -231,7 +240,9 @@ class CommentBottomSheet extends StatelessWidget {
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.bold,
-          color: isDelete ? Colors.red : AppColors.textSecondary,
+          color: isDelete
+              ? Colors.red
+              : (isReport ? Colors.orange : AppColors.textSecondary),
         ),
       ),
     );
@@ -243,7 +254,6 @@ class CommentBottomSheet extends StatelessWidget {
       title: isEdit ? "تعديل التعليق" : "إضافة رد",
       content: TextField(controller: _textController, autofocus: true),
       onConfirm: () {
-        // بما أن controller معرف أعلاه بالـ tag، فهو سيجلب النسخة الصحيحة دائماً
         isEdit
             ? controller.updateComment(comment.id, postId, _textController.text)
             : controller.addReply(postId, comment.id, _textController.text);

@@ -1,9 +1,10 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hobe/features/home/screens/AddProjectScreen.dart';
-import 'package:hobe/features/home/screens/MyActivities.dart';
+import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/JobController.dart';
+import 'package:hobe/features/home/screens/MyApplicationsScreen.dart';
+import 'package:hobe/features/home/screens/MyProjectsScreen.dart';
 import 'package:hobe/features/home/widget/JobCard.dart';
 import 'package:hobe/features/home/widget/home_chip.dart';
 import '../controllers/home_controller.dart';
@@ -13,202 +14,400 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final HomeController homeController = Get.find<HomeController>();
-  //final homeController = Get.find<HomeController>();
-  // final jobController = Get.find<JobController>();
-  //final reactionController = Get.find<ReactionController>();
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     final isDark = theme.brightness == Brightness.dark;
 
-    return Obx(
-      () => Scaffold(
-        backgroundColor: Color.fromARGB(255, 218, 203, 248),
+    return Obx(() {
+      final currentIndex = homeController.currentIndex.value;
 
+      return Scaffold(
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : const Color.fromARGB(255, 218, 203, 248),
         extendBody: true,
 
-        drawer: HomeDrawer(),
-
-        appBar: AppBar(
-          title: const Text("Hobe"),
-
-          actions: [
-            IconButton(icon: const Icon(Icons.notifications), onPressed: () {}),
-          ],
-        ),
-
         body: IndexedStack(
-          index: homeController.currentIndex.value,
+          index: currentIndex,
           children: [
-            const MyActivities(),
+            const MyApplicationsScreen(),
             MainHomeContent(),
-            AddProjectScreen(),
+            MyProjectsScreen(),
           ],
         ),
+
         bottomNavigationBar: CurvedNavigationBar(
-          index: homeController.currentIndex.value,
-
+          index: currentIndex,
           height: 60.0,
-
           items: const <Widget>[
-            Icon(Icons.list_alt, size: 30, color: Colors.white),
-
+            Icon(Icons.assignment_outlined, size: 30, color: Colors.white),
             Icon(Icons.home, size: 35, color: Colors.white),
-
             Icon(Icons.shopping_bag, size: 30, color: Colors.white),
           ],
-
-          color: Color.fromARGB(255, 148, 114, 217),
-
-          buttonBackgroundColor: Color.fromARGB(255, 148, 114, 217),
-
+          color: AppColors.primaryEnd,
+          buttonBackgroundColor: AppColors.primaryEnd,
           backgroundColor: Colors.transparent,
-
           animationCurve: Curves.easeInOutCubic,
-
           animationDuration: const Duration(milliseconds: 600),
-
           onTap: (index) {
             homeController.currentIndex.value = index;
           },
         ),
-      ),
-    );
+      );
+    });
   }
 }
 
 class MainHomeContent extends StatelessWidget {
   MainHomeContent({super.key});
+
   final homeController = Get.find<HomeController>();
   final jobController = Get.find<JobController>();
-  // final reactionController = Get.find<ReactionController>();
+  final ScrollController scrollController = ScrollController();
+  final RxInt selectedCategoryId = 0.obs;
+  final RxString selectedCategoryName = "All".obs;
 
   @override
   Widget build(BuildContext context) {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
+        jobController.loadMoreJobs();
+      }
+    });
+
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    final jobController = Get.find<JobController>();
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(12),
-
-          child: TextField(
-            onChanged: (value) {
-              // دالة للبحث اللحظي عند الكتابة (يمكن إضافة Debounce لاحقاً لتحسين الأداء)
-
-              jobController.searchJobs(value);
-            },
-
-            cursorColor: const Color(0xFF4A148C),
-
-            decoration: InputDecoration(
-              hintText: "Search for jobs...",
-
-              hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
-
-              //prefixIcon: Icon(Icons.search, color: theme.iconTheme.color),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30), // حواف دائرية أكثر
-
-                borderSide: const BorderSide(
-                  color: Color(0xFF4A148C),
-
-                  width: 1.5,
-                ), // لون نهدي غامق
-              ),
-
-              // الحواف عند الضغط (Focus)
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(30),
-
-                borderSide: const BorderSide(
-                  color: Color(0xFF4A148C),
-
-                  width: 2.5,
-                ), // سماكة أكبر عند التحديد
-              ),
-
-              filled: true,
-
-              fillColor: theme.cardColor,
-
-              prefixIcon: const Icon(Icons.search, color: Color(0xFF4A148C)),
-
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-
-                vertical: 15,
-              ),
-
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(20),
-
-                borderSide: BorderSide.none,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      drawer: HomeDrawer(),
+      body: Stack(
+        children: [
+          // الدوائر الخلفية المتموجة والقريبة من المنتصف
+          Positioned(
+            top: 50,
+            right: -50,
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryStart.withOpacity(isDark ? 0.15 : 0.4),
               ),
             ),
           ),
-        ),
-        SizedBox(
-          height: 50, // ضروري جداً
-          child: Obx(() {
-            if (homeController.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            return ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: homeController.categories.length + 1,
-              itemBuilder: (context, index) {
-                if (index == 0) {
-                  return const HomeChip(text: "All", index: 0);
-                }
-                final category = homeController.categories[index - 1];
-                return HomeChip(text: category.name, index: category.id);
-              },
-            );
-          }),
-        ),
-        Expanded(
-          child: Obx(() {
-            if (jobController.isLoading.value) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (jobController.filteredJobs.isEmpty) {
-              return const Center(child: Text("لا توجد وظائف متاحة"));
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              itemCount: jobController.filteredJobs.length,
-              itemBuilder: (_, i) => JobCard(
-                job: jobController.filteredJobs[i],
-                controller: jobController,
+          Positioned(
+            bottom: 80,
+            left: -40,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primaryEnd.withOpacity(isDark ? 0.1 : 0.3),
               ),
-            );
-          }),
-        ),
+            ),
+          ),
 
-        /*  Expanded(
-          child: Obx(() {
-            if (jobController.jobPosts.isEmpty)
-              return const Center(child: CircularProgressIndicator());
+          // المحتوى الأساسي داخل SafeArea
+          SafeArea(
+            child: Column(
+              children: [
+                // AppBar مخصص متناسق مع الخلفية والـ Theme
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0,
+                    vertical: 12.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: Icon(
+                            Icons.menu,
+                            color: isDark
+                                ? AppColors.textDarkPrimary
+                                : AppColors.textLightPrimary,
+                          ),
+                          onPressed: () => Scaffold.of(context).openDrawer(),
+                        ),
+                      ),
+                      Text(
+                        "Hobe",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: isDark
+                              ? AppColors.textDarkPrimary
+                              : AppColors.textLightPrimary,
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? AppColors.darkCard
+                              : AppColors.lightCard,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.notifications,
+                            color: isDark
+                                ? AppColors.textDarkPrimary
+                                : AppColors.textLightPrimary,
+                          ),
+                          onPressed: () {},
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-            return ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+                // شريط البحث (تم تقليل هوامشه الجانبية قليلاً ليتوسع أكثر)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
+                  child: TextField(
+                    onChanged: (value) {
+                      jobController.searchJobs(value);
+                    },
+                    cursorColor: AppColors.Selection,
+                    style: TextStyle(
+                      color: isDark
+                          ? AppColors.textDarkPrimary
+                          : AppColors.textLightPrimary,
+                    ),
+                    decoration: InputDecoration(
+                      hintText: "Search for jobs...",
+                      hintStyle: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 14,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(
+                          color: isDark
+                              ? AppColors.primaryStart.withOpacity(0.5)
+                              : AppColors.Selection,
+                          width: 1.5,
+                        ),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(
+                          color: AppColors.Selection,
+                          width: 2.5,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: isDark
+                          ? AppColors.darkCard
+                          : AppColors.lightCard,
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: AppColors.Selection,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 15,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                  ),
+                ),
 
-              itemCount: jobController.jobPosts.length,
+                // أزرار الفئات (Categories Chips)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  child: Row(
+                    children: [
+                      Obx(
+                        () => HomeChip(
+                          text: selectedCategoryName.value,
+                          index: selectedCategoryId.value,
+                          isSelected: true,
+                          onTap: () {
+                            _showCategoriesBottomSheet(context, isDark);
+                          },
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        onPressed: () {
+                          _showCategoriesBottomSheet(context, isDark);
+                        },
+                        icon: Icon(
+                          Icons.more_horiz_rounded,
+                          color: isDark
+                              ? AppColors.textDarkPrimary
+                              : AppColors.textLightPrimary,
+                          size: 28,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
 
-              itemBuilder: (_, i) => JobCard(
-                job: jobController.jobPosts[i],
+                // قائمة الوظائف مع توسيع العرض (تقليل الحوامش الجانبية إلى 8 بكسل فقط)
+                Expanded(
+                  child: Obx(() {
+                    if (jobController.isLoading.value) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.primaryEnd,
+                          ),
+                        ),
+                      );
+                    }
+                    if (jobController.filteredJobs.isEmpty) {
+                      return Center(
+                        child: Text(
+                          "لا توجد وظائف متاحة",
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(
+                        left: 8, // تقليل المسافة لزيادة العرض
+                        right: 8, // تقليل المسافة لزيادة العرض
+                        top: 8,
+                        bottom: 100, // مسافة أمان لتجنب شريط التنقل
+                      ),
+                      controller: scrollController,
+                      itemCount: jobController.filteredJobs.length,
+                      itemBuilder: (_, i) => Padding(
+                        // استخدام حشوة أفقية صغيرة جداً داخل البوست لضمان امتداده بالعرض
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 6,
+                        ),
+                        child: JobCard(
+                          job: jobController.filteredJobs[i],
+                          controller: jobController,
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-                controller: jobController,
+  void _showCategoriesBottomSheet(BuildContext context, bool isDark) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: isDark ? AppColors.darkCard : Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          height: 350,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "اختر الفئة",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: isDark
+                      ? AppColors.textDarkPrimary
+                      : AppColors.textLightPrimary,
+                ),
               ),
-            );
-          }),
-        ),*/
-      ],
+              const SizedBox(height: 12),
+              Expanded(
+                child: Obx(() {
+                  if (homeController.isLoading.value) {
+                    return Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.primaryEnd,
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView(
+                    children: [
+                      ListTile(
+                        title: Text(
+                          "All",
+                          style: TextStyle(
+                            color: isDark
+                                ? AppColors.textDarkPrimary
+                                : AppColors.textLightPrimary,
+                          ),
+                        ),
+                        leading: Icon(
+                          Icons.grid_view,
+                          color: AppColors.primaryEnd,
+                        ),
+                        onTap: () {
+                          selectedCategoryId.value = 0;
+                          selectedCategoryName.value = "All";
+                          jobController.currentCategoryId = 0;
+                          jobController.fetchJobs();
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ...homeController.categories.map((category) {
+                        return ListTile(
+                          title: Text(
+                            category.name,
+                            style: TextStyle(
+                              color: isDark
+                                  ? AppColors.textDarkPrimary
+                                  : AppColors.textLightPrimary,
+                            ),
+                          ),
+                          leading: Icon(
+                            Icons.work_outline,
+                            color: AppColors.primaryEnd,
+                          ),
+                          onTap: () {
+                            selectedCategoryId.value = category.id;
+                            selectedCategoryName.value = category.name;
+                            jobController.currentCategoryId = category.id;
+                            jobController.fetchJobsByCategory(category.id);
+                            Navigator.pop(context);
+                          },
+                        );
+                      }),
+                    ],
+                  );
+                }),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

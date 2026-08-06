@@ -1,15 +1,9 @@
 abstract class AppRoutes {
   static const splash = '/';
-
   static const login = '/login';
-
   static const signUp = '/signup';
-
   static const otp = '/otp';
-
-  // Forgot Password
   static const forgotPassword = '/forgot-password';
-
   static const resetPassword = '/reset-password';
   static const profile = '/profile';
   static const skills = "/skills";
@@ -42,4 +36,10 @@ abstract class AppRoutes {
   static const String BLOCKED_LIST = '/blocked-list';
   static const String DATA_EXPORT = '/data-export';
   static const String CONVERSATIONS_LIST = '/conversations-list';
+  static const String addProject = '/add-project';
+  static const String projectDetails = '/project-details';
+  static const String editProject = '/edit-project';
+  static const String myPublishedProjects = '/my_published_projects';
+  static const myActivities = '/my-activities';
+  static const String myApplications = '/my-applications';
 }
