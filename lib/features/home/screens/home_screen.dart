@@ -86,7 +86,6 @@ class MainHomeContent extends StatelessWidget {
       drawer: HomeDrawer(),
       body: Stack(
         children: [
-          // الدوائر الخلفية المتموجة والقريبة من المنتصف
           Positioned(
             top: 50,
             right: -50,
@@ -112,11 +111,9 @@ class MainHomeContent extends StatelessWidget {
             ),
           ),
 
-          // المحتوى الأساسي داخل SafeArea
           SafeArea(
             child: Column(
               children: [
-                // AppBar مخصص متناسق مع الخلفية والـ Theme
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16.0,
@@ -174,7 +171,6 @@ class MainHomeContent extends StatelessWidget {
                   ),
                 ),
 
-                // شريط البحث (تم تقليل هوامشه الجانبية قليلاً ليتوسع أكثر)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -232,7 +228,6 @@ class MainHomeContent extends StatelessWidget {
                   ),
                 ),
 
-                // أزرار الفئات (Categories Chips)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
@@ -267,7 +262,6 @@ class MainHomeContent extends StatelessWidget {
                   ),
                 ),
 
-                // قائمة الوظائف مع توسيع العرض (تقليل الحوامش الجانبية إلى 8 بكسل فقط)
                 Expanded(
                   child: Obx(() {
                     if (jobController.isLoading.value) {
@@ -289,15 +283,14 @@ class MainHomeContent extends StatelessWidget {
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.only(
-                        left: 8, // تقليل المسافة لزيادة العرض
-                        right: 8, // تقليل المسافة لزيادة العرض
+                        left: 8,
+                        right: 8,
                         top: 8,
-                        bottom: 100, // مسافة أمان لتجنب شريط التنقل
+                        bottom: 100,
                       ),
                       controller: scrollController,
                       itemCount: jobController.filteredJobs.length,
                       itemBuilder: (_, i) => Padding(
-                        // استخدام حشوة أفقية صغيرة جداً داخل البوست لضمان امتداده بالعرض
                         padding: const EdgeInsets.symmetric(
                           horizontal: 4,
                           vertical: 6,

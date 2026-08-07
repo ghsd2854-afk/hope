@@ -4,14 +4,14 @@ import '../../../core/theme/colors.dart';
 class HomeChip extends StatelessWidget {
   final String text;
   final int index;
-  final bool isSelected; // أضفنا هذا المتغير لنعرف إذا كانت الفئة مختارة أم لا
+  final bool isSelected;
   final VoidCallback onTap;
 
   const HomeChip({
     super.key,
     required this.text,
     required this.index,
-    required this.isSelected, // استقبال حالة الاختيار
+    required this.isSelected,
     required this.onTap,
   });
 
@@ -25,7 +25,7 @@ class HomeChip extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(25),
-          // استبدال selected بـ isSelected
+
           color: isSelected ? AppColors.primaryStart : Colors.white,
           border: Border.all(
             color: isSelected

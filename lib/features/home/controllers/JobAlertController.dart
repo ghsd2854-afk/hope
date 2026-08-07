@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-// استيراد حزمة ديو صراحة مع إعطائها بادئة (prefix) لمنع أي تداخل
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:hobe/features/APIS/api_constants.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
@@ -8,8 +7,6 @@ import 'package:hobe/features/home/models/JobAlertModel.dart';
 class JobAlertController extends GetxController {
   var isLoading = false.obs;
   var jobAlertsList = <JobAlertModel>[].obs;
-
-  // استخدام ديو الموحدة
   final dio = DioService().dio;
 
   @override
@@ -18,15 +15,12 @@ class JobAlertController extends GetxController {
     fetchJobAlerts();
   }
 
-  // 1. جلب قائمة التنبيهات (GET)
   void fetchJobAlerts() async {
     try {
       isLoading.value = true;
-      // تحديد نوع الاستجابة الخاصة بـ dio_pkg لمنع خطأ التعارض
       dio_pkg.Response response = await dio.get(ApiConstants.jobAlerts);
 
       if (response.statusCode == 200) {
-        // التحقق من أن البيانات قادمة بشكل صحيح كـ Map أو List
         var responseData = response.data;
         List data = responseData is Map
             ? (responseData['data'] ?? [])
@@ -47,8 +41,6 @@ class JobAlertController extends GetxController {
     }
   }
 
-  // دالة تعديل تنبيه وظيفي
-  // دالة تعديل تنبيه وظيفي
   Future<void> updateJobAlert(int id, JobAlertModel alertModel) async {
     try {
       isLoading.value = true;
@@ -59,7 +51,6 @@ class JobAlertController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // إعادة جلب القائمة لتحديث البيانات بشكل صحيح
         fetchJobAlerts();
 
         Get.snackbar(
@@ -79,17 +70,13 @@ class JobAlertController extends GetxController {
     }
   }
 
-  // 4. تفعيل أو تعطيل التنبيه (PATCH أو PUT حسب السيرفر)
-  // دالة تفعيل أو إيقاف التنبيه
   Future<void> toggleAlertStatus(int id) async {
     try {
       isLoading.value = true;
 
-      // تغيير نوع الطلب من patch إلى post ليتوافق مع إعدادات الباك إند
       var response = await dio.post('/job-alerts/$id/toggle');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // إعادة جلب القائمة لتحديث الحالة بصرياً
         fetchJobAlerts();
 
         Get.snackbar(
@@ -109,7 +96,6 @@ class JobAlertController extends GetxController {
     }
   }
 
-  // 2. إنشاء تنبيه جديد (POST)
   Future<void> createJobAlert(JobAlertModel alertModel) async {
     try {
       isLoading.value = true;
@@ -138,7 +124,6 @@ class JobAlertController extends GetxController {
     }
   }
 
-  // 3. حذف تنبيه (DELETE)
   Future<void> deleteJobAlert(int id) async {
     try {
       dio_pkg.Response response = await dio.delete(

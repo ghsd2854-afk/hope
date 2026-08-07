@@ -11,7 +11,7 @@ class AddProjectScreen extends StatelessWidget {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      extendBodyBehindAppBar: true, // لمد الخلفية المموجة خلف شريط التطبيق
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: Text(
           controller.isEditing ? "تعديل فكرة المشروع" : "إضافة فكرة مشروع",
@@ -28,7 +28,6 @@ class AddProjectScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // 1. الخلفية المموجة الاحترافية في الأعلى
           Positioned(
             top: 0,
             left: 0,

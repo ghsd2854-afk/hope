@@ -1,11 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:easy_debounce/easy_debounce.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide FormData;
 import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
 import 'package:hobe/features/APIS/api_constants.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
-import 'package:hobe/features/profiles/controller/cvfiles_controller.dart';
 
 class JobController extends GetxController {
   final _dio = DioService().dio;
@@ -15,10 +12,10 @@ class JobController extends GetxController {
   var isSavedLoading = false.obs;
   var isSearching = false.obs;
   var isProcessing = false.obs;
-  var allJobs = <JobPostModel>[].obs; // الوظائف الخام من السيرفر
+  var allJobs = <JobPostModel>[].obs;
   var filteredJobs = <JobPostModel>[].obs;
   var selectedJobFilter = 0.obs;
-  String currentSearchQuery = ""; // تخزين نص البحث الحالي
+  String currentSearchQuery = "";
   int currentCategoryId = 0;
   int currentPage = 1;
   bool hasMoreData = true;
@@ -48,7 +45,6 @@ class JobController extends GetxController {
     }
   }
 
-  // دالة لجلب الوظائف (سواء عند الضغط على فئة جديدة أو التمرير للأسفل)
   Future<void> fetchJobsByCategory(
     int categoryId, {
     bool isLoadMore = false,
@@ -65,27 +61,23 @@ class JobController extends GetxController {
 
     try {
       isJobsLoading.value = true;
-
-      // بناء الرابط حسب إذا كانت "All" (رقم 0) أو فئة معينة
       String endpoint = categoryId == 0
           ? 'jobs?page=$currentPage'
           : '/categories/$categoryId?page=$currentPage';
 
       final response = await DioService().dio.get(endpoint);
-
-      // استخراج البيانات حسب شكل الاستجابة (الـ JSON)
       var jobsData = categoryId == 0
-          ? response.data['data'] // لـ /api/jobs
-          : response.data['data']['jobs']['data']; // لـ /api/categories/{id}
+          ? response.data['data']
+          : response.data['data']['jobs']['data'];
 
       List<JobPostModel> newJobs = (jobsData as List)
           .map((json) => JobPostModel.fromJson(json))
           .toList();
 
       if (newJobs.isEmpty) {
-        hasMoreData = false; // انتهت البيانات ولا توجد صفحات أخرى
+        hasMoreData = false;
       } else {
-        filteredJobs.addAll(newJobs); // إضافة الوظائف الجديدة للقائمة الحالية
+        filteredJobs.addAll(newJobs);
       }
     } catch (e) {
       Get.snackbar("خطأ", "فشل جلب المزيد من الوظائف");
@@ -94,15 +86,11 @@ class JobController extends GetxController {
     }
   }
 
-  // دالة مساعدة يستدعيها الـ ScrollController
   void loadMoreJobs() {
     if (currentCategoryId == null || currentCategoryId == 0) {
-      fetchJobs(isLoadMore: true); // جلب المزيد من الوظائف العامة
+      fetchJobs(isLoadMore: true);
     } else {
-      fetchJobsByCategory(
-        currentCategoryId!,
-        isLoadMore: true,
-      ); // جلب المزيد من فئة معينة
+      fetchJobsByCategory(currentCategoryId!, isLoadMore: true);
     }
   }
 
@@ -118,7 +106,7 @@ class JobController extends GetxController {
 
     try {
       isJobsLoading.value = true;
-      if (!isLoadMore) isLoading(true); // مؤشر التحميل الأساسي للطلب الأول فقط
+      if (!isLoadMore) isLoading(true);
 
       final response = await _dio.get(
         '${ApiConstants.listJobs}?page=$currentPage',
@@ -132,14 +120,14 @@ class JobController extends GetxController {
         }).toList();
 
         if (newJobs.isEmpty) {
-          hasMoreData = false; // انتهت البيانات
+          hasMoreData = false;
         } else {
           if (!isLoadMore) {
-            jobPosts.assignAll(newJobs); // تخزين النسخة الأصلية للطلب الأول
+            jobPosts.assignAll(newJobs);
             filteredJobs.assignAll(newJobs);
           } else {
             jobPosts.addAll(newJobs);
-            filteredJobs.addAll(newJobs); // إضافة البيانات الجديدة عند التمرير
+            filteredJobs.addAll(newJobs);
           }
         }
       }
@@ -154,7 +142,6 @@ class JobController extends GetxController {
 
   Future<JobPostModel?> fetchJobDetails(int jobId) async {
     try {
-      // التحقق إذا كانت الوظيفة موجودة مسبقاً في القائمة المحلية لتوفير طلب السيرفر
       var existingJob = jobPosts.firstWhereOrNull((j) => j.id == jobId);
       if (existingJob != null) return existingJob;
 
@@ -240,7 +227,7 @@ class JobController extends GetxController {
     }
   }
 
-  void applyToJob(int jobId, {String? selectedCvFileId}) async {
+  /*void applyToJob(int jobId, {String? selectedCvFileId}) async {
     int index = jobPosts.indexWhere((j) => j.id == jobId);
     if (index == -1) return;
     var job = jobPosts[index];
@@ -328,7 +315,7 @@ class JobController extends GetxController {
         Get.snackbar("خطأ", "حدث خطأ غير متوقع");
       }
     }
-  }
+  }*/
 
   Future<void> fetchSavedJobs() async {
     isSavedLoading.value = true;

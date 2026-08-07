@@ -22,16 +22,13 @@ class ActivityDetailsView extends StatelessWidget {
         : Get.put(ReactionController());
 
     return Container(
-      // تطبيق التدرج الموحد على مستوى الصفحة بالكامل (يشمل الـ AppBar وخلفية الشاشة معاً)
       decoration: const BoxDecoration(
         gradient: GradientExtension.purpleGradient,
       ),
       child: Scaffold(
-        backgroundColor:
-            Colors.transparent, // جعل خلفية الـ Scaffold شفافة تماماً
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
-          backgroundColor: Colors
-              .transparent, // جعل الـ AppBar شفافاً ليرث التدرج من الخلفية العامة
+          backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: true,
           title: Obx(
@@ -130,7 +127,7 @@ class ActivityDetailsView extends StatelessWidget {
                         }
 
                         Get.to(
-                          () => JobDetailsScreen(
+                          () => JobDetailsActivityScreen(
                             job: snapshot.data!,
                             activityType: type,
                             activityContent: item.desc,

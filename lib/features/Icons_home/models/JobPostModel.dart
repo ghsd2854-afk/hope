@@ -100,7 +100,6 @@ class JobPostModel {
        commentsCount = count.obs;
 
   factory JobPostModel.fromJson(Map<String, dynamic> json) {
-    // دمج الحد الأدنى والحد الأقصى للراتب كنص جاهز إذا لم يرسله السيرفر جاهزاً
     String calculatedSalary = json['salary_range'] ?? '';
     if (calculatedSalary.isEmpty &&
         json['salary_min'] != null &&

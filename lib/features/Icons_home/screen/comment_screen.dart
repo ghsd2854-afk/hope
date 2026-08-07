@@ -54,7 +54,6 @@ class CommentBottomSheet extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final comment = controller.comments[index];
 
-                  // نغلف كل تعليق بـ Obx خاص به لضمان تحديثه فقط عند النقر
                   return Obx(
                     () => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +68,6 @@ class CommentBottomSheet extends StatelessWidget {
                             ),
                             child: InkWell(
                               onTap: () {
-                                // تغيير القيمة فقط، بدون refresh للقائمة كاملة
                                 comment.isExpanded.value =
                                     !comment.isExpanded.value;
                               },

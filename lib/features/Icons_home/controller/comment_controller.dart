@@ -15,11 +15,9 @@ class CommentController extends GetxController {
 
   var isLoading = false.obs;
   String? tag;
-  // داخل CommentController
   @override
   void onClose() {
     super.onClose();
-    // هذا سيجعل GetX يمسح الكنترولر من الذاكرة فور إغلاق الـ BottomSheet
     print("🧹 تم تنظيف الذاكرة للـ Controller ذو الـ tag: $tag");
   }
 
@@ -32,8 +30,6 @@ class CommentController extends GetxController {
       final response = await _dio.get("/posts/$postId/comments");
 
       if (response.statusCode == 200) {
-        // السيرفر يرسل البيانات كاملة، الموديل سيتولى الباقي
-
         comments.value = (response.data as List)
             .map((e) => CommentModel.fromJson(e))
             .toList();
@@ -51,8 +47,6 @@ class CommentController extends GetxController {
     for (var comment in list) {
       if (comment.id == id) return comment;
 
-      // البحث في الردود
-
       var foundInReplies = findCommentById(comment.replies, id);
 
       if (foundInReplies != null) return foundInReplies;
@@ -60,8 +54,6 @@ class CommentController extends GetxController {
 
     return null;
   }
-
-  // هذا الكود موجود داخل ملف lib/features/Icons_home/controller/comment_controller.dart
 
   Future<void> addComment(int postId, String content) async {
     try {
@@ -100,10 +92,8 @@ class CommentController extends GetxController {
         data: {"content": content, "parent_id": parentId},
       );
 
-      // هنا يتم تحديث النسخة الخاصة بهذا الـ tag فقط
       await fetchComments(postId);
 
-      // البحث باستخدام دالتك
       var parent = findCommentById(comments, parentId);
 
       if (parent != null) {
@@ -153,11 +143,10 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        // البحث عن التعليق في القائمة الحالية وتحديثه فقط
         int index = comments.indexWhere((c) => c.id == commentId);
         if (index != -1) {
-          comments[index].content = newContent; // تحديث النص
-          comments.refresh(); // إخبار الـ Obx بأننا غيرنا محتوى العنصر
+          comments[index].content = newContent;
+          comments.refresh();
         }
         print("✅ تم تعديل التعليق محلياً");
       }
@@ -193,16 +182,13 @@ class CommentController extends GetxController {
       final response = await _dio.delete("/comments/$commentId");
 
       if (response.statusCode == 200) {
-        // 1. حذف التعليق أو الرد محلياً
         bool removed = _recursiveRemove(comments, commentId);
 
         if (removed) {
-          // 2. تحديث العداد العام للمنشور
           final JobController jobController = Get.find<JobController>();
           var post = jobController.jobPosts.firstWhere((p) => p.id == postId);
           post.commentsCount.value--;
 
-          // 3. تحديث الواجهة
           comments.refresh();
         }
         print("✅ تم الحذف وتحديث الواجهة محلياً");
@@ -212,16 +198,12 @@ class CommentController extends GetxController {
     }
   }
 
-  // دالة مساعدة (منطقها يشبه دالة البحث الخاصة بكِ)
   bool _recursiveRemove(List<CommentModel> list, int id) {
-    // البحث في المستوى الحالي
     for (int i = 0; i < list.length; i++) {
       if (list[i].id == id) {
-        list.removeAt(i); // حذف التعليق أو الرد
+        list.removeAt(i);
         return true;
       }
-
-      // إذا لم نجده، نبحث داخل الردود (نفس منطق findCommentById)
       if (_recursiveRemove(list[i].replies, id)) {
         return true;
       }
@@ -230,11 +212,7 @@ class CommentController extends GetxController {
   }
 
   Future<void> addReactionToComment(int commentId, String type) async {
-    // 1. البحث العميق عن التعليق أو الرد
-
     var targetComment = findCommentById(comments, commentId);
-
-    // 2. التحديث الفوري (Optimistic Update) إذا وجدنا التعليق
 
     if (targetComment != null) {
       targetComment.isReacted.value = true;
@@ -243,10 +221,8 @@ class CommentController extends GetxController {
 
       targetComment.reactionsCount.value += 1;
 
-      comments.refresh(); // تحديث الواجهة فوراً
+      comments.refresh();
     }
-
-    // 3. إرسال الطلب للسيرفر
 
     try {
       await _dio.post('/comments/$commentId/react', data: {'type': type});
@@ -255,8 +231,6 @@ class CommentController extends GetxController {
     } catch (e) {
       print("❌ خطأ في إضافة التفاعل: $e");
 
-      // 4. التراجع عن التحديث في حال الفشل
-
       if (targetComment != null) {
         targetComment.isReacted.value = false;
 
@@ -264,7 +238,7 @@ class CommentController extends GetxController {
 
         targetComment.reactionsCount.value -= 1;
 
-        comments.refresh(); // إعادة الحالة الأصلية للواجهة
+        comments.refresh();
       }
     }
   }
@@ -278,8 +252,6 @@ class CommentController extends GetxController {
       );
 
       if (response.statusCode == 200) {
-        // استخدم الدالة الجديدة للبحث
-
         var targetComment = findCommentById(comments, commentId);
 
         if (targetComment != null) {
@@ -288,8 +260,6 @@ class CommentController extends GetxController {
           targetComment.userReactionType.value = null;
 
           targetComment.reactionsCount.value -= 1;
-
-          // تحديث الواجهة
 
           comments.refresh();
 

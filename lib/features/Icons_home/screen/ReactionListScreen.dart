@@ -13,13 +13,12 @@ class ReactionListScreen extends StatefulWidget {
 }
 
 class _ReactionListScreenState extends State<ReactionListScreen> {
-  // 2. عرف الكنترولر هنا
   final ReactionController controller = Get.find<ReactionController>();
 
   @override
   void initState() {
     super.initState();
-    // 3. استدعاء البيانات مرة واحدة عند فتح الشاشة
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.getStats(widget.postId);
     });
@@ -144,7 +143,6 @@ class _ReactionListScreenState extends State<ReactionListScreen> {
             style: const TextStyle(fontWeight: FontWeight.w600),
           ),
           trailing: Text(
-            // استدعاء الدالة الموحدة من الكنترولر بدلاً من الدالة المحلية المحذوفة
             controller.getIconString(user.type),
             style: const TextStyle(fontSize: 20),
           ),

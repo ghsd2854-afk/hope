@@ -1,5 +1,5 @@
 class ReportModel {
-  final String reportableType; // مثل 'job_post' أو 'comment'
+  final String reportableType;
   final int reportableId;
   final String reason;
   final String details;

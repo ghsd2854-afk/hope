@@ -11,14 +11,10 @@ class JobDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // حقن الـ Controller الخاص بالتفاصيل مع تمرير الـ jobId وجلب البيانات داخله (أو يمكنك نقل fetchJobDetails إلى onInit في الـ Controller)
     final JobDetailsController controller = Get.put(
       JobDetailsController(),
       tag: jobId.toString(),
     );
-
-    // ملاحظة: الأفضل وضع fetchJobDetails داخل الonInit الخاص بالـ Controller لضمان استدعائه مرة واحدة فقط.
-    // لكن تلافياً لأي تعديل خارجي، سنتركه هنا فقط إذا لم تقم بوضعه هناك، ويفضل نقله للـ Controller.
     controller.fetchJobDetails(jobId);
 
     return Scaffold(
@@ -33,12 +29,14 @@ class JobDetailsScreen extends StatelessWidget {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.black87),
       ),
-      // زر سفلي ثابت للتقديم (Bottom Bar احترافي)
+
       bottomNavigationBar: Obx(() {
         if (controller.isLoading.value || controller.jobDetails.value == null) {
           return const SizedBox.shrink();
         }
+
         final job = controller.jobDetails.value!;
+
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
@@ -53,48 +51,37 @@ class JobDetailsScreen extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // زر الحفظ (Bookmark)
-              /*  IconButton(
-                onPressed: () {
-                  job.isSaved.toggle();
-                  // هنا يمكنك إضافة استدعاء الـ API الخاص بالحفظ
-                },
-                icon: Icon(
-                  job.isSaved.value ? Icons.bookmark : Icons.bookmark_border,
-                  color: job.isSaved.value
-                      ? AppColors.primaryEnd
-                      : Colors.grey[700],
-                  size: 28,
-                ),
-              ),*/
               const SizedBox(width: 12),
-              // زر التقديم الرئيسي
+
               Expanded(
-                child: ElevatedButton(
-                  onPressed: job.canApply && !job.isApplied.value
-                      ? () {
-                          // منطق التقديم على الوظيفة
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryEnd,
-                    disabledBackgroundColor: Colors.grey[300],
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: job.isApplied.value
+                        ? null
+                        : () {
+                            print("🟢 تم النقر على زر التقديم بنجاح!");
+
+                            controller.applyToJob(job);
+                          },
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: job.isApplied.value
+                          ? Colors.green.withOpacity(0.1)
+                          : AppColors.primaryEnd,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    job.isApplied.value
-                        ? "تم التقديم مسبقاً"
-                        : "قدم على الوظيفة الآن",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: job.isApplied.value
-                          ? Colors.grey[600]
-                          : Colors.white,
+                    child: Text(
+                      job.isApplied.value ? "تم التقديم ✓" : "تقديم طلب عمل",
+                      style: TextStyle(
+                        color: job.isApplied.value
+                            ? Colors.green
+                            : Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ),
@@ -118,7 +105,6 @@ class JobDetailsScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. كارت رأس الوظيفة والشركة
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
@@ -233,8 +219,6 @@ class JobDetailsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-
-              // 2. بطاقات الإحصائيات والمعلومات السريعة
               Row(
                 children: [
                   Expanded(
@@ -278,7 +262,6 @@ class JobDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // 3. الوسوم (Tags) إن وجدت
               if (job.tags.isNotEmpty) ...[
                 Wrap(
                   spacing: 6,
@@ -308,8 +291,6 @@ class JobDetailsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 20),
               ],
-
-              // 4. وصف الوظيفة
               const Text(
                 "وصف الوظيفة",
                 style: TextStyle(
@@ -343,8 +324,6 @@ class JobDetailsScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 5. المهارات المطلوبة
               if (job.skills.isNotEmpty) ...[
                 const Text(
                   "المهارات المطلوبة",
@@ -387,7 +366,6 @@ class JobDetailsScreen extends StatelessWidget {
     );
   }
 
-  // ودجت مصغرة لتنسيق كروت المعلومات المزدوجة
   Widget _buildInfoCard({
     required String title,
     required String value,

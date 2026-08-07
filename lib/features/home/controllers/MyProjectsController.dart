@@ -6,7 +6,7 @@ import 'package:hobe/features/APIS/dio_services.dart';
 
 class MyProjectsController extends GetxController {
   var isLoading = false.obs;
-  var projectsList = <dynamic>[].obs; // لتخزين قائمة المشاريع
+  var projectsList = <dynamic>[].obs;
 
   @override
   void onInit() {
@@ -14,19 +14,16 @@ class MyProjectsController extends GetxController {
     fetchMyProjects();
   }
 
-  // جلب قائمة المشاريع الخاصة بالمستخدم
   void fetchMyProjects() async {
     try {
       isLoading.value = true;
       final dioInstance = DioService().dio;
 
-      // استخدام الـ Endpoint الظاهرة في البوستمان
       final response = await dioInstance.get(
         '${ApiConstants.createStartupProject}/my-projects',
       );
 
       if (response.statusCode == 200) {
-        // استخراج الـ data من الـ Response حسب استجابة البوستمان
         final data = response.data['data'];
         if (data != null) {
           projectsList.value = data;

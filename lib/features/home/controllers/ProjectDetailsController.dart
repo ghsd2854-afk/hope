@@ -88,10 +88,7 @@ class ProjectDetailsController extends GetxController {
     try {
       isLoading.value = true;
       final dioInstance = DioService().dio;
-
-      // استخدام المسار الصحيح المعتمد على الـ id
       final url = ApiConstants.startupProjectDetails(projectId);
-      // أو مباشرة: final url = '/startup-projects/$projectId';
 
       print("Requesting URL: $url");
 
@@ -122,34 +119,4 @@ class ProjectDetailsController extends GetxController {
       isLoading.value = false;
     }
   }
-
-  /* void fetchProjectDetails() async {
-    try {
-      isLoading.value = true;
-      final dioInstance = DioService().dio;
-
-      // استخدام ApiConstants.createStartupProject بالطريقة الصحيحة
-      final url = '${ApiConstants.createStartupProject}/$projectId';
-      print("Requesting URL: $url");
-
-      final response = await dioInstance.get(url);
-
-      if (response.statusCode == 200) {
-        final responseData = response.data['data'] ?? response.data;
-        project.value = ProjectModel.fromJson(responseData);
-      }
-    } on dio_pkg.DioException catch (e) {
-      print("Error Code: ${e.response?.statusCode}");
-      print("Error Message: ${e.response?.data}");
-
-      Get.snackbar(
-        "خطأ",
-        e.response?.data['message'] ?? "فشل في تحميل تفاصيل المشروع",
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
-    } finally {
-      isLoading.value = false;
-    }
-  }*/
 }

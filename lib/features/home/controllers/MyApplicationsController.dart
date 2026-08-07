@@ -23,8 +23,6 @@ class MyApplicationsController extends GetxController {
         '🚀 [API Request] جاري جلب طلبات التوظيف من: ${ApiConstants.baseUrl}${ApiConstants.myApplications}',
       );
       print('==================================================');
-
-      // استخدام DioService المشترك في مشروعك (يقوم بحقن الـ Token تلقائياً عبر الـ Interceptor)
       final response = await DioService().dio.get(ApiConstants.myApplications);
 
       print('📥 [API Response Status Code]: ${response.statusCode}');

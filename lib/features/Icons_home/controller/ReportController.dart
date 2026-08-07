@@ -15,8 +15,6 @@ class ReportController extends GetxController {
   }) async {
     try {
       isLoading.value = true;
-
-      // استخدام DioService الجاهز لديكِ لإرسال الطلب مع التوكن تلقائياً
       await DioService().dio.post(
         ApiConstants.Report,
         data: {
@@ -27,7 +25,7 @@ class ReportController extends GetxController {
         },
       );
 
-      Get.back(); // إغلاق نافذة إدخال السبب
+      Get.back();
       Get.snackbar(
         "تم الإرسال",
         "شكراً لك، تم إرسال البلاغ بنجاح ومراجعته.",
@@ -35,10 +33,8 @@ class ReportController extends GetxController {
         colorText: Colors.white,
       );
     } on DioException catch (e) {
-      // التعامل مع أخطاء الـ API وإظهار رسالة واضحة إن وجدت
       String errorMessage = "حدث خطأ أثناء إرسال البلاغ، حاول مرة أخرى.";
       if (e.response != null && e.response?.data != null) {
-        // إذا كان الـ Backend يرسل رسالة خطأ محددة
         errorMessage = e.response?.data['message'] ?? errorMessage;
       }
 

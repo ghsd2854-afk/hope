@@ -253,7 +253,7 @@ class JobCard extends StatelessWidget {
               const SizedBox(height: 16),
 
               // 4️⃣ زر التقديم
-              /* Obx(
+              /*  Obx(
                 () => SizedBox(
                   width: double.infinity,
                   height: 45,

@@ -159,8 +159,7 @@ class AppPages {
     ),
     GetPage(name: AppRoutes.projectDetails, page: () => ProjectDetailsScreen()),
     GetPage(
-      name: AppRoutes
-          .myPublishedProjects, // تأكدي من توفره في AppRoutes أو استبدليه بالاسم المناسب
+      name: AppRoutes.myPublishedProjects,
       page: () => MyProjectsScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut<MyProjectsController>(() => MyProjectsController());
@@ -168,7 +167,7 @@ class AppPages {
     ),
     GetPage(name: AppRoutes.myActivities, page: () => const MyActivities()),
     GetPage(
-      name: AppRoutes.myApplications, // استخدام الثابت من ملف Routes
+      name: AppRoutes.myApplications,
       page: () => const MyApplicationsScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut<MyApplicationsController>(() => MyApplicationsController());
