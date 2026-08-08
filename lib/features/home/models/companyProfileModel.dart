@@ -1,4 +1,4 @@
-class CompanyProfileModel {
+/*class CompanyProfileModel {
   final CompanyModel? company;
   final UserModel? user;
   final List<JobModel> jobs;
@@ -24,6 +24,38 @@ class CompanyProfileModel {
           : [],
       projects: json['projects'] ?? [],
       stats: json['stats'] != null ? StatsModel.fromJson(json['stats']) : null,
+    );
+  }
+}*/
+class CompanyProfileModel {
+  final CompanyModel? company;
+  final UserModel? user;
+  final List<JobModel> jobs;
+  final List<dynamic> projects;
+  final StatsModel? stats;
+
+  CompanyProfileModel({
+    this.company,
+    this.user,
+    required this.jobs,
+    required this.projects,
+    this.stats,
+  });
+
+  factory CompanyProfileModel.fromJson(Map<String, dynamic> json) {
+    // 🌟 التعديل هنا: سحب البيانات من مفتاح 'data' الموجود في الـ Response
+    final data = json['data'] ?? json;
+
+    return CompanyProfileModel(
+      company: data['company'] != null
+          ? CompanyModel.fromJson(data['company'])
+          : null,
+      user: data['user'] != null ? UserModel.fromJson(data['user']) : null,
+      jobs: data['jobs'] != null
+          ? (data['jobs'] as List).map((v) => JobModel.fromJson(v)).toList()
+          : [],
+      projects: data['projects'] ?? [],
+      stats: data['stats'] != null ? StatsModel.fromJson(data['stats']) : null,
     );
   }
 }

@@ -159,7 +159,7 @@ class JobDetailsScreen extends StatelessWidget {
                     if (job.company != null)
                       GestureDetector(
                         onTap: () => Get.to(
-                          () => const CompanyProfileScreen(),
+                          () => CompanyProfileScreen(),
                           arguments: job.company!.id,
                         ),
                         child: Row(

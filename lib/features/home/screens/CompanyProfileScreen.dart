@@ -997,6 +997,99 @@ class CompanyProfileScreen extends StatelessWidget {
 }
 /*
 
+
+
+  void _confirmBlock(BuildContext context, dynamic company) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('حظر الشركة'),
+        content: Text(
+          'لن تظهر لك منشورات "${company.companyName}" بعد الحظر. هل تريد المتابعة؟',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('تراجع'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              final blockController = Get.isRegistered<BlockController>()
+                  ? Get.find<BlockController>()
+                  : Get.put(BlockController());
+
+              blockController.blockEntity(
+                type: 'company',
+                id: company.id,
+                name: company.companyName,
+              );
+            },
+            child: const Text('حظر', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOptionsMenu(BuildContext context, dynamic company) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.block, color: Colors.red),
+                title: const Text(
+                  "حظر الشركة",
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _confirmBlock(context, company);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.flag_outlined, color: Colors.orange),
+                title: const Text(
+                  "شكوى على الشركة",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  ComplaintUI.showComplaintDialog(
+                    context,
+                    company.id,
+                    'company',
+                    "تقديم شكوى على الشركة",
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
  
               // 🌟 4️⃣ قسم معاينة التقييمات (آخر 3 تقييمات فقط + زر عرض الكل)
               Row(

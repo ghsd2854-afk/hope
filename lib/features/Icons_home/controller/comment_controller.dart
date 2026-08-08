@@ -26,6 +26,29 @@ class CommentController extends GetxController {
 
     try {
       isLoading(true);
+      final response = await _dio.get("/posts/$postId/comments");
+
+      if (response.statusCode == 200) {
+        // التصحيح هنا: الاستجابة أصبحت مقسمة لصفحات Paginated وتحتوي على مفتاح ['data']
+        List<dynamic> commentsJson = response.data['data'];
+
+        comments.value = commentsJson
+            .map((e) => CommentModel.fromJson(e))
+            .toList();
+
+        print("✅ تم جلب التعليقات وتفاعلاتها بطلب واحد فقط!");
+      }
+    } catch (e) {
+      print("❌ خطأ: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+  /*Future<void> fetchComments(int postId) async {
+    print("🔍 جاري جلب التعليقات للمنشور رقم: $postId");
+
+    try {
+      isLoading(true);
       // comments.clear();
       final response = await _dio.get("/posts/$postId/comments");
 
@@ -41,7 +64,7 @@ class CommentController extends GetxController {
     } finally {
       isLoading(false);
     }
-  }
+  }*/
 
   CommentModel? findCommentById(List<CommentModel> list, int id) {
     for (var comment in list) {

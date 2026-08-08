@@ -12,6 +12,7 @@ import 'package:hobe/features/auth/views/otp_screen.dart';
 import 'package:hobe/features/home/controllers/AddProjectController.dart';
 import 'package:hobe/features/home/controllers/MyApplicationsController.dart';
 import 'package:hobe/features/home/controllers/MyProjectsController.dart'; // <--- Controller الخاص بمشاريعك
+import 'package:hobe/features/home/controllers/ProfileUserController.dart';
 import 'package:hobe/features/home/screens/MyActivities.dart';
 import 'package:hobe/features/home/screens/MyApplicationsScreen.dart';
 import 'package:hobe/features/home/screens/MyProjectsScreen.dart'; // <--- شاشتك الخاصة بمشاريعي
@@ -20,6 +21,7 @@ import 'package:hobe/features/home/controllers/conversations_controller.dart';
 import 'package:hobe/features/home/controllers/data_export_controller.dart';
 import 'package:hobe/features/home/controllers/home_controller.dart';
 import 'package:hobe/features/home/screens/AddProjectScreen.dart';
+import 'package:hobe/features/home/screens/ProfileUserScreen.dart';
 import 'package:hobe/features/home/screens/ProjectDetailsScreen.dart';
 import 'package:hobe/features/home/screens/blocked_list_screen.dart';
 import 'package:hobe/features/home/screens/conversations_list_screen.dart';
@@ -171,6 +173,17 @@ class AppPages {
       page: () => const MyApplicationsScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut<MyApplicationsController>(() => MyApplicationsController());
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.userProfile,
+      page: () => const ProfileUserScreen(),
+      binding: BindingsBuilder(() {
+        // إضافة fenix: true لضمان إعادة إنشاء الكنترولر وتحديث البيانات عند تغير المستخدم
+        Get.lazyPut<ProfileUserController>(
+          () => ProfileUserController(),
+          fenix: true,
+        );
       }),
     ),
   ];

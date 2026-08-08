@@ -3,6 +3,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:hobe/app_routes.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/comment_controller.dart';
 import 'package:hobe/features/Icons_home/models/comment_model.dart';
@@ -141,11 +142,20 @@ class CommentBottomSheet extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        comment.userName ?? "مستخدم",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                      InkWell(
+                        onTap: () {
+                          Get.toNamed(
+                            AppRoutes.userProfile,
+                            arguments: comment.userId,
+                          );
+                        },
+                        child: Text(
+                          comment.userName ?? "مستخدم",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: AppColors.primaryEnd,
+                          ),
                         ),
                       ),
                       Text(

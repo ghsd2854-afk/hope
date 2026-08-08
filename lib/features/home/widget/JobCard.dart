@@ -5,7 +5,7 @@ import 'package:hobe/features/Icons_home/controller/JobController.dart';
 import 'package:hobe/features/Icons_home/controller/ReactionController.dart';
 import 'package:hobe/features/Icons_home/controller/comment_controller.dart';
 import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
-import 'package:hobe/features/Icons_home/screen/JobDetailsScreen.dart'; // 👈 تأكدت من استيراد صفحة التفاصيل
+import 'package:hobe/features/Icons_home/screen/JobDetailsScreen.dart';
 import 'package:hobe/features/Icons_home/screen/ReactionButton.dart';
 import 'package:hobe/features/Icons_home/screen/ReactionListScreen.dart';
 import 'package:hobe/features/Icons_home/screen/ReportDialog.dart';
@@ -27,22 +27,27 @@ class JobCard extends StatelessWidget {
     final ReactionController reactionController =
         Get.find<ReactionController>();
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.darkCard : AppColors.lightCard,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
         ],
-        border: Border.all(color: AppColors.border.withOpacity(0.3)),
+        border: Border.all(
+          color: isDark ? Colors.white12 : AppColors.border.withOpacity(0.3),
+        ),
       ),
       child: InkWell(
-        // 👈 الطلب الثاني: الضغط على البوست بالكامل ينقل لصفحة تفاصيل الوظيفة
         onTap: () {
           Get.to(() => JobDetailsScreen(jobId: job.id));
         },
@@ -77,7 +82,7 @@ class JobCard extends StatelessWidget {
                           GestureDetector(
                             onTap: () {
                               Get.to(
-                                () => const CompanyProfileScreen(),
+                                () => CompanyProfileScreen(),
                                 arguments: job.company!.id,
                               );
                             },
@@ -93,16 +98,20 @@ class JobCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           job.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            color: Colors.black,
+                            color: isDark
+                                ? AppColors.textDarkPrimary
+                                : AppColors.textLightPrimary,
                           ),
                         ),
                         Text(
                           job.location + (job.isRemote ? " (عن بعد)" : ""),
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: isDark
+                                ? AppColors.textSecondary
+                                : Colors.grey[600],
                             fontSize: 12,
                           ),
                         ),
@@ -119,7 +128,7 @@ class JobCard extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: job.isFollowingCompany.value
-                              ? Colors.grey[200]
+                              ? (isDark ? Colors.grey[800] : Colors.grey[200])
                               : AppColors.primaryEnd,
                           borderRadius: BorderRadius.circular(20),
                         ),
@@ -127,7 +136,7 @@ class JobCard extends StatelessWidget {
                           job.isFollowingCompany.value ? "متابع" : "متابعة",
                           style: TextStyle(
                             color: job.isFollowingCompany.value
-                                ? Colors.grey[700]
+                                ? (isDark ? Colors.white70 : Colors.grey[700])
                                 : Colors.white,
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -138,7 +147,13 @@ class JobCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   PopupMenuButton<String>(
-                    icon: Icon(Icons.more_vert, color: Colors.grey[600]),
+                    icon: Icon(
+                      Icons.more_vert,
+                      color: isDark
+                          ? AppColors.textSecondary
+                          : Colors.grey[600],
+                    ),
+                    color: isDark ? AppColors.darkCard : AppColors.lightCard,
                     onSelected: (value) {
                       if (value == 'block') {
                         _confirmBlock(context);
@@ -155,42 +170,45 @@ class JobCard extends StatelessWidget {
                       }
                     },
                     itemBuilder: (context) => [
-                      /*if (job.company != null)
-                        const PopupMenuItem(
-                          value: 'block',
-                          child: Row(
-                            children: [
-                              Icon(Icons.block, size: 18, color: Colors.red),
-                              SizedBox(width: 8),
-                              Text('حظر الشركة'),
-                            ],
-                          ),
-                        ),*/
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'report',
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.flag_outlined,
                               size: 18,
                               color: Colors.orange,
                             ),
-                            SizedBox(width: 8),
-                            Text('إبلاغ عن المنشور'),
+                            const SizedBox(width: 8),
+                            Text(
+                              'إبلاغ عن المنشور',
+                              style: TextStyle(
+                                color: isDark
+                                    ? AppColors.textDarkPrimary
+                                    : AppColors.textLightPrimary,
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'job_alert',
                         child: Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.notifications_active_outlined,
                               size: 18,
                               color: Colors.blue,
                             ),
-                            SizedBox(width: 8),
-                            Text('إضافة تنبيه لهذه الوظيفة'),
+                            const SizedBox(width: 8),
+                            Text(
+                              'إضافة تنبيه لهذه الوظيفة',
+                              style: TextStyle(
+                                color: isDark
+                                    ? AppColors.textDarkPrimary
+                                    : AppColors.textLightPrimary,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -214,7 +232,7 @@ class JobCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
 
-              // 3️⃣ الوصف (الطلب الأول: عرض المزيد محلياً بدون طلب سيرفر عبر controller.toggleJobExpansion)
+              // 3️⃣ الوصف
               Obx(() {
                 final bool expanded = job.isExpanded.value;
 
@@ -228,7 +246,7 @@ class JobCard extends StatelessWidget {
                           ? TextOverflow.visible
                           : TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: Colors.grey[800],
+                        color: isDark ? Colors.grey[300] : Colors.grey[800],
                         fontSize: 14,
                         height: 1.4,
                       ),
@@ -252,39 +270,11 @@ class JobCard extends StatelessWidget {
               }),
               const SizedBox(height: 16),
 
-              // 4️⃣ زر التقديم
-              /*  Obx(
-                () => SizedBox(
-                  width: double.infinity,
-                  height: 45,
-                  child: ElevatedButton(
-                    onPressed: job.isApplied.value
-                        ? null
-                        : () => controller.applyToJob(job.id),
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: job.isApplied.value
-                          ? Colors.green.withOpacity(0.1)
-                          : AppColors.primaryEnd,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: Text(
-                      job.isApplied.value ? "تم التقديم ✓" : "تقديم طلب عمل",
-                      style: TextStyle(
-                        color: job.isApplied.value
-                            ? Colors.green
-                            : Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Divider(
+                  color: isDark ? Colors.white12 : AppColors.border,
                 ),
-              ),*/
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 10),
-                child: Divider(),
               ),
 
               // 5️⃣ الإحصائيات + أزرار التفاعل
@@ -307,9 +297,11 @@ class JobCard extends StatelessWidget {
                         child: Obx(
                           () => Text(
                             "${job.reactionsCount.value}",
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: Colors.grey,
+                              color: isDark
+                                  ? AppColors.textSecondary
+                                  : Colors.grey,
                             ),
                           ),
                         ),
@@ -319,7 +311,10 @@ class JobCard extends StatelessWidget {
                   Obx(
                     () => Text(
                       "${job.commentsCount.value} تعليقات",
-                      style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      style: TextStyle(
+                        color: isDark ? AppColors.textSecondary : Colors.grey,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -332,6 +327,7 @@ class JobCard extends StatelessWidget {
                   _buildActionButton(
                     icon: Icons.chat_bubble_outline_rounded,
                     label: "تعليق",
+                    color: isDark ? AppColors.textSecondary : Colors.grey[600],
                     onTap: () => _openComments(job),
                   ),
                   Obx(
@@ -342,7 +338,9 @@ class JobCard extends StatelessWidget {
                       label: "حفظ",
                       color: job.isSaved.value
                           ? AppColors.primaryEnd
-                          : Colors.grey[600],
+                          : (isDark
+                                ? AppColors.textSecondary
+                                : Colors.grey[600]),
                       onTap: () => controller.toggleSave(job),
                     ),
                   ),
@@ -357,11 +355,12 @@ class JobCard extends StatelessWidget {
 
   void _showJobAlertBottomSheet(BuildContext context) {
     List<String> extractedKeywords = job.title.split(' ');
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkCard : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -380,27 +379,39 @@ class JobCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "إنشاء تنبيه لهذه الوظيفة",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isDark
+                          ? AppColors.textDarkPrimary
+                          : AppColors.textLightPrimary,
+                    ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: Icon(
+                      Icons.close,
+                      color: isDark ? AppColors.textDarkPrimary : Colors.black,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const Divider(),
+              Divider(color: isDark ? Colors.white12 : AppColors.border),
               const SizedBox(height: 10),
               Text(
                 "سيتم إنشاء تنبيه بناءً على عنوان وموقع هذه الوظيفة ليتم إعلامك بالوظائف المشابهة مستقبلاً:",
-                style: TextStyle(color: Colors.grey[700], fontSize: 13),
+                style: TextStyle(
+                  color: isDark ? AppColors.textSecondary : Colors.grey[700],
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 15),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.grey[100],
+                  color: isDark ? AppColors.darkBackground : Colors.grey[100],
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
@@ -408,17 +419,30 @@ class JobCard extends StatelessWidget {
                   children: [
                     Text(
                       "اسم التنبيه: ${job.title}",
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isDark
+                            ? AppColors.textDarkPrimary
+                            : AppColors.textLightPrimary,
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       "الموقع: ${job.location}",
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.textSecondary
+                            : Colors.grey[700],
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Text(
                       "الكلمات المفتاحية: ${extractedKeywords.join(', ')}",
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(
+                        color: isDark
+                            ? AppColors.textSecondary
+                            : Colors.grey[700],
+                      ),
                     ),
                   ],
                 ),
@@ -477,17 +501,34 @@ class JobCard extends StatelessWidget {
   }
 
   void _confirmBlock(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('حظر الشركة'),
+        backgroundColor: isDark ? AppColors.darkCard : Colors.white,
+        title: Text(
+          'حظر الشركة',
+          style: TextStyle(
+            color: isDark
+                ? AppColors.textDarkPrimary
+                : AppColors.textLightPrimary,
+          ),
+        ),
         content: Text(
           'لن تظهر لك منشورات "${job.company!.companyName}" بعد الحظر. هل تريد المتابعة؟',
+          style: TextStyle(
+            color: isDark ? AppColors.textSecondary : Colors.grey[800],
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('تراجع'),
+            child: Text(
+              'تراجع',
+              style: TextStyle(
+                color: isDark ? AppColors.textSecondary : Colors.grey,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -537,18 +578,16 @@ class JobCard extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          Icon(icon, color: color ?? Colors.grey[600], size: 18),
+          Icon(icon, color: color, size: 18),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(color: color ?? Colors.grey[600], fontSize: 13),
-          ),
+          Text(label, style: TextStyle(color: color, fontSize: 13)),
         ],
       ),
     );
   }
 
   void _openComments(JobPostModel job) {
+    final bool isDark = Get.isDarkMode;
     var commentController = Get.put(
       CommentController(),
       tag: job.id.toString(),
@@ -557,16 +596,17 @@ class JobCard extends StatelessWidget {
     Get.bottomSheet(
       CommentBottomSheet(postId: job.id),
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkCard : Colors.white,
     );
   }
 
   void _openReactionList(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     Get.find<ReactionController>().resetReactionData();
     Get.bottomSheet(
       ReactionListScreen(postId: job.id),
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? AppColors.darkCard : Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),

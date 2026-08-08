@@ -10,7 +10,6 @@ class JobAlertsScreen extends StatelessWidget {
 
   JobAlertsScreen({super.key});
 
-  // نافذة الإنشاء أو التعديل (نفس النافذة مع دعم تمرير التنبيه في حال التعديل)
   void _showJobAlertBottomSheet(
     BuildContext context, {
     JobAlertModel? alertToEdit,

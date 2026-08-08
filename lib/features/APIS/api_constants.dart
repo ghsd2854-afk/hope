@@ -161,4 +161,5 @@ class ApiConstants {
   static String companyReviews(int companyId) =>
       "/companies/$companyId/reviews";
   static const String myApplications = "/my-applications";
+  static String publicProfile(int userId) => "/public-profile/$userId";
 }

@@ -42,4 +42,5 @@ abstract class AppRoutes {
   static const String myPublishedProjects = '/my_published_projects';
   static const myActivities = '/my-activities';
   static const String myApplications = '/my-applications';
+  static const String userProfile = '/user-profile';
 }
