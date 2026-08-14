@@ -452,7 +452,7 @@ class CompanyProfileScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              Obx(
+                              /* Obx(
                                 () => Text(
                                   '(${ratingController.reviewsList.length})',
                                   style: const TextStyle(
@@ -460,7 +460,7 @@ class CompanyProfileScreen extends StatelessWidget {
                                     fontSize: 14,
                                   ),
                                 ),
-                              ),
+                              ),*/
                             ],
                           ),
                           TextButton.icon(

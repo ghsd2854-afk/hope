@@ -12,22 +12,34 @@ class ActivityModel {
   });
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) {
-    int postId = json['job_post_id'] ?? json['id'] ?? 0;
+    int postId = json['job_post_id'] ?? 0;
+
     String contentTitle = '';
     String contentDesc = '';
+    String type = json['type'] ?? '';
 
-    if (json.containsKey('comment')) {
-      contentTitle = "تعليق";
-      contentDesc = json['comment']?.toString() ?? '';
-    } else if (json.containsKey('reaction')) {
-      // هنا نجعل الوصف يحمل نوع التفاعل حصراً بدون ذكر الـ ID
+    // التحقق بناءً على الـ type القادم من الـ API
+    if (type == 'reaction') {
       contentTitle = "تفاعل";
-      contentDesc = json['reaction']?.toString() ?? 'إعجاب';
+      var meta = json['meta'];
+      if (meta is Map && meta.containsKey('type')) {
+        contentDesc = meta['type']
+            .toString(); // يجلب نوع التفاعل مثل love أو support
+      } else {
+        contentDesc = 'love';
+      }
+    } else if (type == 'comment') {
+      contentTitle = "تعليق";
+      var meta = json['meta'];
+      if (meta is Map && meta.containsKey('content')) {
+        contentDesc = meta['content']
+            .toString(); // يجلب نص التعليق مثل "حلووحلووو"
+      } else {
+        contentDesc = json['comment']?.toString() ?? '';
+      }
     } else {
-      contentTitle =
-          json['title']?.toString() ?? json['name']?.toString() ?? 'نشاط جديد';
-      contentDesc =
-          json['description']?.toString() ?? json['body']?.toString() ?? '';
+      contentTitle = json['job_post']?['title']?.toString() ?? 'نشاط جديد';
+      contentDesc = json['description']?.toString() ?? '';
     }
 
     return ActivityModel(

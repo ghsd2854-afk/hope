@@ -33,8 +33,7 @@ class ProfileModel {
     this.cvFile,
   });
 
-  factory ProfileModel.fromJson(
-      Map<String, dynamic> json) {
+  factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
       id: json["id"],
       fullName: json["full_name"],

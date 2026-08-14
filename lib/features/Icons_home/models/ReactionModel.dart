@@ -58,6 +58,40 @@ class StatsResponse {
   factory StatsResponse.fromJson(Map<String, dynamic> json) {
     int total = (json['total'] ?? 0) as int;
 
+    // 👈 التعديل هنا: الوصول إلى كائن الـ reactions الداخلي
+    var outerReactions = json['reactions'];
+    Map<String, dynamic> reactionsMap = {};
+
+    if (outerReactions is Map<String, dynamic>) {
+      // إذا كان الـ JSON يأتي بشكل متداخل: reactions -> reactions
+      var innerReactions = outerReactions['reactions'];
+      if (innerReactions is Map<String, dynamic>) {
+        reactionsMap = innerReactions;
+      } else {
+        reactionsMap = outerReactions; // احتياطاً إن كان يأتي بالشكل المباشر
+      }
+    }
+
+    Map<String, ReactionGroup> parsedReactions = {};
+
+    reactionsMap.forEach((key, value) {
+      if (value != null && value is Map<String, dynamic>) {
+        parsedReactions[key] = ReactionGroup.fromJson(value);
+      }
+    });
+
+    return StatsResponse(total: total, reactions: parsedReactions);
+  }
+}
+/*class StatsResponse {
+  final int total;
+  final Map<String, ReactionGroup> reactions;
+
+  StatsResponse({required this.total, required this.reactions});
+
+  factory StatsResponse.fromJson(Map<String, dynamic> json) {
+    int total = (json['total'] ?? 0) as int;
+
     var reactionsMap = json['reactions'] as Map<String, dynamic>? ?? {};
 
     Map<String, ReactionGroup> parsedReactions = {};
@@ -70,7 +104,7 @@ class StatsResponse {
 
     return StatsResponse(total: total, reactions: parsedReactions);
   }
-}
+}*/
 
 class ReactionGroup {
   final int count;

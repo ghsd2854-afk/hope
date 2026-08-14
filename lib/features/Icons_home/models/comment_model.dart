@@ -1,4 +1,5 @@
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hobe/features/Icons_home/models/ReactionModel.dart';
 
 class CommentModel {
@@ -59,11 +60,45 @@ class CommentModel {
        this.isExpanded = false.obs;
 
   factory CommentModel.fromJson(Map<String, dynamic> json) {
+    List<dynamic> reactionsList = json['reactions'] ?? [];
+
+    final box = GetStorage();
+    // التصحيح هنا ليكون متوافقاً مع ما نخزنه من البروفايل العام
+    int currentUserId = box.read("current_user_id") ?? 0;
+
+    var myReaction = reactionsList.firstWhere(
+      (r) => r['user_id'] == currentUserId,
+      orElse: () => null,
+    );
+
+    return CommentModel(
+      id: json['id'],
+      content: json['content'] ?? "",
+      userId: json['user_id'] ?? 0,
+      userName: json['user'] != null ? json['user']['name'] : "مستخدم",
+      jobPostId: json['job_post_id'],
+      reactionsCount: json['reactions_count'] ?? 0,
+      repliesCount: json['replies_count'] ?? 0,
+      parentId: json['parent_id'],
+      replies: json['replies'] != null
+          ? (json['replies'] as List)
+                .map((i) => CommentModel.fromJson(i))
+                .toList()
+          : [],
+      userReactionType: myReaction != null
+          ? myReaction['type'].toString()
+          : null,
+      isReacted: myReaction != null,
+    );
+  }
+  /*factory CommentModel.fromJson(Map<String, dynamic> json) {
     // 1. تعريف مصفوفة التفاعلات
     List<dynamic> reactionsList = json['reactions'] ?? [];
 
     // 2. حساب تفاعل المستخدم الحالي (استبدل 6 بالـ ID الخاص بك)
-    int currentUserId = 6;
+    // int currentUserId = 6;
+    final box = GetStorage();
+    int currentUserId = box.read("user_id") ?? 0;
     var myReaction = reactionsList.firstWhere(
       (r) => r['user_id'] == currentUserId,
       orElse: () => null,
@@ -90,5 +125,5 @@ class CommentModel {
           : null,
       isReacted: myReaction != null,
     );
-  }
+  }*/
 }

@@ -11,7 +11,6 @@ import 'package:hobe/features/auth/services/profile_services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileController extends GetxController {
-
   final fullNameController = TextEditingController();
   final headlineController = TextEditingController();
   final summaryController = TextEditingController();
@@ -78,12 +77,9 @@ class ProfileController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _service.createProfile(
-        data: _buildFormData(),
-      );
+      await _service.createProfile(data: _buildFormData());
 
       Get.snackbar("Success", "Profile Created");
-
     } catch (e) {
       print("CREATE ERROR: $e");
       Get.snackbar("Error", e.toString());
@@ -96,12 +92,9 @@ class ProfileController extends GetxController {
     try {
       isLoading.value = true;
 
-      await _service.updateProfile(
-        data: _buildFormData(),
-      );
+      await _service.updateProfile(data: _buildFormData());
 
       Get.snackbar("Success", "Profile Updated");
-
     } catch (e) {
       print("UPDATE ERROR: $e");
       Get.snackbar("Error", e.toString());
@@ -116,7 +109,6 @@ class ProfileController extends GetxController {
 
       final result = await _service.getProfile();
       profile.value = result;
-
       fullNameController.text = result.fullName ?? "";
       headlineController.text = result.headline ?? "";
       summaryController.text = result.summary ?? "";
@@ -129,7 +121,6 @@ class ProfileController extends GetxController {
       linkedinController.text = result.linkedin ?? "";
       githubController.text = result.github ?? "";
       portfolioController.text = result.portfolio ?? "";
-
     } finally {
       isLoading.value = false;
     }

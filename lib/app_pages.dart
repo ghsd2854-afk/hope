@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:hobe/Notification/controller/NotificationController.dart';
+import 'package:hobe/Notification/screen/NotificationScreen.dart';
 import 'package:hobe/core/setting/setting_screen.dart';
 import 'package:hobe/features/Icons_home/controller/JobController.dart';
 import 'package:hobe/features/Icons_home/controller/ReactionController.dart';
@@ -13,6 +15,7 @@ import 'package:hobe/features/home/controllers/AddProjectController.dart';
 import 'package:hobe/features/home/controllers/MyApplicationsController.dart';
 import 'package:hobe/features/home/controllers/MyProjectsController.dart'; // <--- Controller الخاص بمشاريعك
 import 'package:hobe/features/home/controllers/ProfileUserController.dart';
+import 'package:hobe/features/home/controllers/UserReviewsController.dart';
 import 'package:hobe/features/home/screens/MyActivities.dart';
 import 'package:hobe/features/home/screens/MyApplicationsScreen.dart';
 import 'package:hobe/features/home/screens/MyProjectsScreen.dart'; // <--- شاشتك الخاصة بمشاريعي
@@ -23,6 +26,7 @@ import 'package:hobe/features/home/controllers/home_controller.dart';
 import 'package:hobe/features/home/screens/AddProjectScreen.dart';
 import 'package:hobe/features/home/screens/ProfileUserScreen.dart';
 import 'package:hobe/features/home/screens/ProjectDetailsScreen.dart';
+import 'package:hobe/features/home/screens/UserReviewsScreen.dart';
 import 'package:hobe/features/home/screens/blocked_list_screen.dart';
 import 'package:hobe/features/home/screens/conversations_list_screen.dart';
 import 'package:hobe/features/home/screens/data_export_screen.dart';
@@ -184,6 +188,21 @@ class AppPages {
           () => ProfileUserController(),
           fenix: true,
         );
+      }),
+    ),
+    GetPage(
+      name: AppRoutes.userReviews,
+      page: () => const UserReviewsScreen(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<UserReviewsController>(() => UserReviewsController());
+      }),
+    ),
+
+    GetPage(
+      name: AppRoutes.notifications,
+      page: () => const NotificationScreen(),
+      binding: BindingsBuilder(() {
+        Get.lazyPut<NotificationController>(() => NotificationController());
       }),
     ),
   ];

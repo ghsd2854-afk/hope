@@ -1,9 +1,11 @@
 import 'package:get/get.dart';
+import 'package:hobe/Notification/controller/NotificationController.dart';
 import 'package:hobe/features/APIS/api_constants.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
 import 'package:hobe/features/Icons_home/models/CategoryModel.dart';
 import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
 import 'package:hobe/features/Icons_home/models/post_model.dart';
+import 'package:hobe/features/auth/controllers/profile_controller.dart';
 import 'package:hobe/features/home/models/ActivityModel.dart';
 
 class HomeController extends GetxController {
@@ -12,6 +14,9 @@ class HomeController extends GetxController {
   var isLoading = false.obs;
   var categories = <CategoryModel>[].obs;
   int? currentCategoryId;
+  final NotificationController notificationController = Get.put(
+    NotificationController(),
+  );
 
   var posts = <PostModel>[
     PostModel(
@@ -26,8 +31,10 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    notificationController.fetchUnreadCount();
     //  fetchCategories();
     fetchCategories();
+    Get.put(ProfileController()).getProfile();
   }
 
   Future<void> fetchCategories() async {

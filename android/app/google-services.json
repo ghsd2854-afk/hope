@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "296843118998",
+    "project_id": "hopeproject-9b47d",
+    "storage_bucket": "hopeproject-9b47d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296843118998:android:2278120b766787f478b5b7",
+        "android_client_info": {
+          "package_name": "com.example.hobe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNiDv--W0Br-r6BnxBNxLnf82emDYlVa0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

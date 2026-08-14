@@ -1,6 +1,8 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hobe/Notification/controller/NotificationController.dart';
+import 'package:hobe/app_routes.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/JobController.dart';
 import 'package:hobe/features/home/screens/MyApplicationsScreen.dart';
@@ -66,6 +68,9 @@ class MainHomeContent extends StatelessWidget {
   final homeController = Get.find<HomeController>();
   final jobController = Get.find<JobController>();
   final ScrollController scrollController = ScrollController();
+  final NotificationController notificationController = Get.put(
+    NotificationController(),
+  );
   final RxInt selectedCategoryId = 0.obs;
   final RxString selectedCategoryName = "All".obs;
 
@@ -143,28 +148,32 @@ class MainHomeContent extends StatelessWidget {
                               : AppColors.textLightPrimary,
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? AppColors.darkCard
-                              : AppColors.lightCard,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
+                      // داخل Row في الشاشة الرئيسية
+                      Obx(
+                        () => Stack(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.notifications),
+                              onPressed: () =>
+                                  Get.toNamed(AppRoutes.notifications),
                             ),
+                            if (notificationController.unreadCount.value > 0)
+                              Positioned(
+                                right: 8,
+                                top: 8,
+                                child: CircleAvatar(
+                                  radius: 8,
+                                  backgroundColor: Colors.red,
+                                  child: Text(
+                                    "${notificationController.unreadCount.value}",
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
                           ],
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.notifications,
-                            color: isDark
-                                ? AppColors.textDarkPrimary
-                                : AppColors.textLightPrimary,
-                          ),
-                          onPressed: () {},
                         ),
                       ),
                     ],

@@ -3,6 +3,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hobe/app_routes.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/comment_controller.dart';
@@ -11,11 +12,21 @@ import 'package:hobe/features/Icons_home/screen/ReportDialog.dart';
 
 class CommentBottomSheet extends StatelessWidget {
   final int postId;
+  //هاد التعديل ازبطو بعدين  عشان تكرار الاستدعاء
+  /*late final CommentController controller = Get.put(
+    CommentController(),
+    tag: postId.toString(),
+  );*/
   late final CommentController controller = Get.find<CommentController>(
     tag: postId.toString(),
   );
+
   final TextEditingController _textController = TextEditingController();
-  CommentBottomSheet({super.key, required this.postId});
+  CommentBottomSheet({super.key, required this.postId}) {
+    // 👈 التأكد من تهيئة الـ Controller وجلب التعليقات فور فتح الـ BottomSheet
+    controller.initController(postId);
+    //  controller.fetchComments(postId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,18 +59,54 @@ class CommentBottomSheet extends StatelessWidget {
           ),
           const Divider(thickness: 0.5),
           Expanded(
-            child: Obx(
-              () => ListView.builder(
+            child: Obx(() {
+              // 1. عرض مؤشر تحميل أثناء جلب الصفحة الأولى
+              if (controller.isLoading.value && controller.comments.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              // 2. عرض رسالة إذا كانت القائمة فارغة
+              if (controller.comments.isEmpty) {
+                return const Center(child: Text("لا توجد تعليقات بعد"));
+              }
+
+              // 3. القائمة الأساسية مع ربط الـ ScrollController
+              return ListView.builder(
+                controller: controller
+                    .scrollController, // 👈 ربط الـ ScrollController هنا
                 padding: const EdgeInsets.symmetric(horizontal: 15),
-                itemCount: controller.comments.length,
+                itemCount:
+                    controller.comments.length +
+                    (controller.hasMore
+                        ? 1
+                        : 0), // 👈 إضافة عنصر إضافي لدائرة التحميل بالأسفل
                 itemBuilder: (context, index) {
+                  // 👈 إذا وصلنا لنحاية القائمة ويتم جلب المزيد، نعرض دائرة تحميل في الأسفل
+                  if (index == controller.comments.length) {
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 15),
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+
                   final comment = controller.comments[index];
+
+                  // التحقق هل التعليق الأساسي يخص المستخدم الحالي؟
+                  final box = GetStorage();
+                  int currentUserId = box.read("current_user_id") ?? 0;
+                  bool isMyParentComment =
+                      currentUserId != 0 && comment.userId == currentUserId;
 
                   return Obx(
                     () => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildModernComment(context, comment),
+                        // تمرير التعليق الأساسي
+                        _buildModernComment(
+                          context,
+                          comment,
+                          isParentCommentMyComment: isMyParentComment,
+                        ),
 
                         if (comment.replies.isNotEmpty)
                           Padding(
@@ -95,6 +142,7 @@ class CommentBottomSheet extends StatelessWidget {
                                     context,
                                     reply,
                                     isReply: true,
+                                    isParentCommentMyComment: isMyParentComment,
                                   ),
                                 ),
                               )
@@ -103,8 +151,8 @@ class CommentBottomSheet extends StatelessWidget {
                     ),
                   );
                 },
-              ),
-            ),
+              );
+            }),
           ),
           _buildModernInput(theme),
         ],
@@ -116,7 +164,21 @@ class CommentBottomSheet extends StatelessWidget {
     BuildContext context,
     CommentModel comment, {
     bool isReply = false,
+    bool isParentCommentMyComment =
+        false, // لمعرفة ما إذا كان التعليق الأساسي ملكاً لكِ
   }) {
+    final box = GetStorage();
+    var rawUserId = box.read("current_user_id");
+    int currentUserId = rawUserId is int
+        ? rawUserId
+        : int.tryParse(rawUserId?.toString() ?? '') ?? 0;
+
+    // هل هذا التعليق (أو الرد) ملكي شخصياً؟
+    bool isMyComment = currentUserId != 0 && comment.userId == currentUserId;
+
+    // الصلاحية الكاملة تتوفر إذا كان التعليق ملكي، أو إذا كان رداً واقعاً تحت تعليقي الأساسي
+    bool hasFullControl = isMyComment || (isReply && isParentCommentMyComment);
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -169,34 +231,41 @@ class CommentBottomSheet extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 4, right: 10),
                   child: Row(
                     children: [
-                      _buildActionText(
-                        "تعديل",
-                        () => _showEditOrReplyDialog(comment, isEdit: true),
-                      ),
+                      // زر التفاعل يظهر للجميع
+                      _buildReactionButton(comment),
                       const SizedBox(width: 10),
-                      // 🚨 زر الإبلاغ عن التعليق (بجانب التعديل)
-                      _buildActionText("إبلاغ", () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => ReportDialog(
-                            reportableType: 'comment',
-                            reportableId: comment.id,
-                          ),
-                        );
-                      }, isReport: true),
-                      const SizedBox(width: 10),
+
+                      // زر الرد يظهر للجميع
                       _buildActionText(
                         "رد",
                         () => _showEditOrReplyDialog(comment, isEdit: false),
                       ),
                       const SizedBox(width: 10),
-                      _buildActionText(
-                        "حذف",
-                        () => controller.deleteComment(comment.id, postId),
-                        isDelete: true,
-                      ),
-                      const SizedBox(width: 10),
-                      _buildReactionButton(comment),
+
+                      // شروط الصلاحيات: إذا كان لديك صلاحية كاملة (تعليقك أو رد تحت تعليقك)
+                      if (hasFullControl) ...[
+                        _buildActionText(
+                          "تعديل",
+                          () => _showEditOrReplyDialog(comment, isEdit: true),
+                        ),
+                        const SizedBox(width: 10),
+                        _buildActionText(
+                          "حذف",
+                          () => controller.deleteComment(comment.id, postId),
+                          isDelete: true,
+                        ),
+                      ] else ...[
+                        // زر الإبلاغ يظهر لباقي المستخدمين والتعليقات التي لا تملك صلاحية كاملة عليها
+                        _buildActionText("إبلاغ", () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => ReportDialog(
+                              reportableType: 'comment',
+                              reportableId: comment.id,
+                            ),
+                          );
+                        }, isReport: true),
+                      ],
                     ],
                   ),
                 ),
@@ -209,6 +278,110 @@ class CommentBottomSheet extends StatelessWidget {
   }
 
   Widget _buildReactionButton(CommentModel comment) {
+    return Obx(() {
+      bool isReacted = comment.isReacted.value;
+      String reactionType = comment.userReactionType.value ?? 'like';
+
+      // تحديد النص أو الأيقونة بناءً على نوع التفاعل الحالي
+      String label = "إعجاب";
+      Color color = AppColors.textSecondary;
+
+      if (isReacted) {
+        switch (reactionType) {
+          case 'love':
+            label = "أحببته ❤️";
+            color = Colors.red;
+            break;
+          case 'haha':
+            label = "ضحكني 😆";
+            color = Colors.amber;
+            break;
+          case 'sad':
+            label = "أحزنني 😢";
+            color = Colors.orange;
+            break;
+          case 'angry':
+            label = "أغضبني 😡";
+            color = Colors.deepOrange;
+            break;
+          case 'like':
+          default:
+            label = "أعجبني 👍";
+            color = Colors.blue;
+            break;
+        }
+      }
+
+      return GestureDetector(
+        // 1. الضغط مرة واحدة: إذا كان متفاعلاً مسبقاً يحذفه، وإذا لم يكن متفاعلاً يرسل "like" مباشرة
+        onTap: () {
+          if (isReacted) {
+            controller.deleteReactionFromComment(comment.id, reactionType);
+          } else {
+            controller.addReactionToComment(comment.id, "like");
+          }
+        },
+        // 2. الضغط المطول: يظهر نافذة تحتوي على كافة خيارات التفاعلات
+        onLongPress: () {
+          _showReactionPopup(comment);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 4,
+            vertical: 2,
+          ), // تم التصحيح هنا
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ),
+      );
+    });
+  }
+
+  // دالة لإظهار كافة خيارات التفاعلات عند الضغط المطول
+  void _showReactionPopup(CommentModel comment) {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // أعجبني (Like)
+              _buildPopupIcon(comment.id, "👍", "like"),
+              // أححبته (Love)
+              _buildPopupIcon(comment.id, "❤️", "love"),
+              // ضحكني (Haha)
+              _buildPopupIcon(comment.id, "😆", "haha"),
+              // أحزنني (Sad)
+              _buildPopupIcon(comment.id, "😢", "sad"),
+              // أغضبني (Angry)
+              _buildPopupIcon(comment.id, "😡", "angry"),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // دالة مساعدة لإنشاء أيقونات النافذة المنسدلة بشكل مرتب ومنسق
+  Widget _buildPopupIcon(int commentId, String emoji, String type) {
+    return IconButton(
+      icon: Text(emoji, style: const TextStyle(fontSize: 22)),
+      onPressed: () {
+        Get.back();
+        controller.addReactionToComment(commentId, type);
+      },
+    );
+  }
+  /* Widget _buildReactionButton(CommentModel comment) {
     return Obx(
       () => InkWell(
         onTap: () {
@@ -233,7 +406,7 @@ class CommentBottomSheet extends StatelessWidget {
         ),
       ),
     );
-  }
+  }*/
 
   Widget _buildActionText(
     String label,
@@ -299,9 +472,12 @@ class CommentBottomSheet extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.send, color: AppColors.primaryEnd),
             onPressed: () {
-              if (_textController.text.isNotEmpty) {
-                controller.addComment(postId, _textController.text);
-                _textController.clear();
+              // استخدام trim() للتأكد من أن النص ليس مسافات فارغة
+              if (_textController.text.trim().isNotEmpty) {
+                final text = _textController.text;
+                _textController
+                    .clear(); // تفريغ الحقل فوراً لكي يشعر المستخدم بالاستجابة
+                controller.addComment(postId, text); // إرسال النص المخزن
               }
             },
           ),

@@ -12,6 +12,11 @@ class MyProjectsScreen extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      floatingActionButtonLocation: _CustomFloatingActionButtonLocation(
+        FloatingActionButtonLocation.endFloat,
+        0, // x offset
+        -70, // y offset
+      ),
       body: Stack(
         children: [
           // خلفية مموجة ومتموهة احترافية تتناسب مع الثيم
@@ -258,8 +263,31 @@ class MyProjectsScreen extends StatelessWidget {
           ),
         ],
       ),
+
       // زر الإضافة بتصميم متناسق وعائم
-      floatingActionButton: Transform.translate(
+      floatingActionButton: Container(
+        // احتفظ بالـ Container لتزيين الظل
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.Selection.withOpacity(0.4),
+              blurRadius: 12,
+              offset: Offset(0, 6),
+            ),
+          ],
+        ),
+        child: FloatingActionButton(
+          elevation: 0,
+          onPressed: () async {
+            await Get.toNamed(AppRoutes.addProject);
+            controller.fetchMyProjects();
+          },
+          child: Icon(Icons.add_rounded, size: 28, color: Colors.white),
+          backgroundColor: AppColors.Selection,
+        ),
+      ),
+      /* floatingActionButton: Transform.translate(
         offset: const Offset(
           0,
           -100,
@@ -285,7 +313,25 @@ class MyProjectsScreen extends StatelessWidget {
             backgroundColor: AppColors.Selection,
           ),
         ),
-      ),
+      ),*/
     );
+  }
+}
+
+class _CustomFloatingActionButtonLocation extends FloatingActionButtonLocation {
+  final FloatingActionButtonLocation location;
+  final double offsetX;
+  final double offsetY;
+
+  _CustomFloatingActionButtonLocation(
+    this.location,
+    this.offsetX,
+    this.offsetY,
+  );
+
+  @override
+  Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
+    Offset offset = location.getOffset(scaffoldGeometry);
+    return Offset(offset.dx + offsetX, offset.dy + offsetY);
   }
 }

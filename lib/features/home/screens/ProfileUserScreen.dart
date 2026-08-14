@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hobe/app_routes.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/home/controllers/ProfileUserController.dart';
 import 'package:hobe/features/home/models/ProfileUserModel.dart';
+import 'package:hobe/features/home/screens/ComplaintWidget.dart';
 
 class ProfileUserScreen extends GetView<ProfileUserController> {
   const ProfileUserScreen({Key? key}) : super(key: key);
@@ -87,24 +89,72 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                 ),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 45,
-                      backgroundColor: AppColors.primaryEnd.withOpacity(0.15),
-                      backgroundImage: user.photo != null
-                          ? NetworkImage(user.photo!)
-                          : null,
-                      child: user.photo == null
-                          ? Text(
-                              (user.name != null && user.name!.isNotEmpty)
-                                  ? user.name![0].toUpperCase()
-                                  : "U",
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryEnd,
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // 1. الصورة في المنتصف تماماً
+                        CircleAvatar(
+                          radius: 45,
+                          backgroundColor: AppColors.primaryEnd.withOpacity(
+                            0.15,
+                          ),
+                          backgroundImage: user.photo != null
+                              ? NetworkImage(user.photo!)
+                              : null,
+                          child: user.photo == null
+                              ? Text(
+                                  (user.name != null && user.name!.isNotEmpty)
+                                      ? user.name![0].toUpperCase()
+                                      : "U",
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryEnd,
+                                  ),
+                                )
+                              : null,
+                        ),
+
+                        // 2. زر الثلاث نقاط مثبت على أقصى اليمين
+                        Align(
+                          alignment: Alignment.topRight,
+                          child: PopupMenuButton<String>(
+                            icon: Icon(
+                              Icons.more_vert,
+                              color: isDarkMode ? Colors.white : Colors.black54,
+                            ),
+                            onSelected: (value) {
+                              if (value == 'complaint') {
+                                ComplaintUI.showComplaintDialog(
+                                  context,
+                                  user.id,
+                                  'user',
+                                  'شكوى على المستخدم',
+                                );
+                              }
+                            },
+                            itemBuilder: (BuildContext context) => [
+                              const PopupMenuItem<String>(
+                                value: 'complaint',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.report_problem_outlined,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'شكوى على المستخدم',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )
-                          : null,
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -249,12 +299,34 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                 ),
 
               // 7. Reviews Section
+              // استدعاء قسم الـ Reviews مع إضافة زر الانتقال في الطرف الآخر
               if (profileData.reviews.isNotEmpty)
                 _buildSection(
                   context: context,
                   title: "Reviews",
                   icon: Icons.star,
+
+                  // زر عرض الكل في أقصى الطرف الآخر
+                  trailingAction: TextButton(
+                    onPressed: () {
+                      // تأكد أن المتغير يمثل معرف المستخدم الصحيح (مثلاً user.id أو controller.userId)
+                      print(
+                        "Passing User ID: ${user.id}",
+                      ); // للتأكد عبر الـ Console من قيمته
+                      Get.toNamed(AppRoutes.userReviews, arguments: user.id);
+                    },
+                    child: const Text(
+                      "عرض الكل",
+                      style: TextStyle(
+                        color: AppColors.primaryEnd,
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+
                   children: profileData.reviews
+                      .take(2)
                       .map((review) => _buildReviewItem(context, review))
                       .toList(),
                 ),
@@ -267,13 +339,12 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     });
   }
 
-  // Widget لتصميم قسم رئيسي متوافق مع الثيم
-  // Widget لتصميم قسم رئيسي متوافق مع الثيم
   Widget _buildSection({
     required BuildContext context,
     required String title,
     required IconData icon,
     required List<Widget> children,
+    Widget? trailingAction, // أضف هذا البارامتر الاختياري
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final cardColor = Theme.of(context).cardColor;
@@ -288,31 +359,30 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: isDarkMode
-                ? Colors.black.withOpacity(0.2)
-                : Colors.grey.withOpacity(0.04),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment
+                .spaceBetween, // لتوزيع الأيقونة والعنوان في طرف والزر في الطرف الآخر
             children: [
-              Icon(icon, color: AppColors.primaryEnd), // تم إزالة const هنا
-              const SizedBox(width: 8),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
+              Row(
+                children: [
+                  Icon(icon, color: AppColors.primaryEnd),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: textColor,
+                    ),
+                  ),
+                ],
               ),
+              if (trailingAction != null)
+                trailingAction, // عرض الزر في أقصى الطرف المقابل إن وجد
             ],
           ),
           Divider(
@@ -325,7 +395,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     );
   }
 
-  // Widget لإحصائيات المشاهدات
   // Widget لإحصائيات المشاهدات
   Widget _buildStatCard(
     BuildContext context,

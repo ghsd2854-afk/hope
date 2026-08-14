@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = "http://192.168.1.15:8000/api";
+  static const String baseUrl = "http://192.168.1.3:8000/api";
   static const String listJobs = "/jobs";
   static const String followUnfollow = "/companies/";
   static const String jobLike = "/posts/";
@@ -18,7 +18,8 @@ class ApiConstants {
   static const String verifyOtp = "/verify-otp";
 
   static const String login = "/login";
-  static const String loginVerifyOtp = "/login/verify-otp";
+  //static const String loginVerifyOtp = "/login/verify-otp";
+  static const String loginVerifyOtp = "/verify-otp";
 
   static const String requestPasswordOtp = "/password/request-otp";
 
@@ -162,4 +163,9 @@ class ApiConstants {
       "/companies/$companyId/reviews";
   static const String myApplications = "/my-applications";
   static String publicProfile(int userId) => "/public-profile/$userId";
+  static const String saveFCMToken = "/save-fcm-token";
+  static const String notifications = "/notifications";
+  static const String notificationsUnreadCount = "/notifications/unread-count";
+  static const String notificationsReadAll = "/notifications/read-all";
+  static String notificationRead(int id) => "/notifications/$id/read";
 }

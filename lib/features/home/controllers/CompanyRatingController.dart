@@ -9,6 +9,7 @@ class CompanyRatingController extends GetxController {
   var isFetchingReviews = false.obs;
 
   var reviewsList = <CompanyReviewModel>[].obs;
+  final Rx<CompanyReviewStats?> stats = Rx<CompanyReviewStats?>(null);
 
   var overallRating = 0.obs;
   var workEnvironmentRating = 0.obs;
@@ -20,7 +21,7 @@ class CompanyRatingController extends GetxController {
   var isAnonymous = 0.obs;
 
   Future<void> submitReview(
-    int userId, { // <--- يفضل تسميته userId وفتحه بناءً على المنطق الجديد
+    int userId, {
     required String title,
     required String pros,
     required String cons,
@@ -55,7 +56,6 @@ class CompanyRatingController extends GetxController {
 
       final dio = DioService().dio;
 
-      // تأكد هل الـ Endpoint يتطلب userId أم id الشركة القديم في رابط الـ applications
       await dio.post('/applications/$userId/review', data: requestData);
 
       Get.back();
@@ -97,12 +97,28 @@ class CompanyRatingController extends GetxController {
       List dataList = [];
 
       if (responseData is Map) {
+        // 1. البحث عن الـ stats سواء كانت في الجذر الرئيسي أو داخل حقل data
+        var statsSource =
+            responseData['stats'] ??
+            (responseData['data'] is Map
+                ? responseData['data']['stats']
+                : null);
+
+        if (statsSource != null) {
+          stats.value = CompanyReviewStats.fromJson(statsSource);
+        } else {
+          stats.value = null;
+        }
+        print("🔍 API RESPONSE: ${response.data}");
+        // 2. استخراج قائمة التقييمات بدقة حسب هيكل الـ JSON
         final dataField = responseData['data'];
 
         if (dataField is Map) {
           if (dataField['reviews'] is Map &&
               dataField['reviews']['data'] is List) {
             dataList = dataField['reviews']['data'];
+          } else if (dataField['data'] is List) {
+            dataList = dataField['data'];
           }
         } else if (dataField is List) {
           dataList = dataField;
@@ -116,11 +132,12 @@ class CompanyRatingController extends GetxController {
           .toList();
 
       print(
-        "✅ [CompanyRatingController] Reviews fetched successfully. Count: ${reviewsList.length}",
+        "✅ [CompanyRatingController] Reviews fetched successfully. Count: ${reviewsList.length}, Stats loaded: ${stats.value != null}",
       );
     } catch (e) {
       print("❌ [CompanyRatingController] Error fetching reviews: $e");
       reviewsList.clear();
+      stats.value = null;
     } finally {
       isFetchingReviews.value = false;
     }

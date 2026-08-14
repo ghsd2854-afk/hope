@@ -1,8 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_instance/src/extension_instance.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
 import 'package:hobe/features/Icons_home/controller/JobController.dart';
 
@@ -10,61 +12,142 @@ import 'package:hobe/features/Icons_home/models/comment_model.dart';
 
 class CommentController extends GetxController {
   final Dio _dio = DioService().dio;
+  final box = GetStorage();
 
   var comments = <CommentModel>[].obs;
 
   var isLoading = false.obs;
+  var isLoadingMore = false.obs;
+  int currentPage = 1;
+  bool hasMore = true;
+  late ScrollController scrollController;
   String? tag;
+  int? postId;
+
+  @override
+  void onInit() {
+    super.onInit();
+    scrollController = ScrollController();
+    //  scrollController.addListener(
+    //   _scrollListener,
+    // ); // ربط المراقب عند بدء الـ Controller
+    fetchPublicProfile();
+  }
+
   @override
   void onClose() {
+    scrollController.dispose();
     super.onClose();
     print("🧹 تم تنظيف الذاكرة للـ Controller ذو الـ tag: $tag");
   }
 
+  //هاد التعديل ازبطو بعدين  عشان تكرار الاستدعاء
+  /* void initController(int id) {
+    // 🛑 إذا كان الـ Controller مهيأ مسبقاً لنفس المنشور، لا تكرر الطلب أبداً
+    if (postId == id) return;
+
+    postId = id;
+
+    // ربط المراقب مرة واحدة فقط
+    if (!scrollController.hasListeners) {
+      scrollController.addListener(_scrollListener);
+    }
+
+    fetchComments(id);
+  }*/
+  void initController(int id) {
+    if (postId == null) {
+      postId = id;
+      scrollController.addListener(_scrollListener);
+      // initScrollListener(id); // ربط التمرير مع الـ postId الصحيح
+      fetchComments(id); // جلب الصفحة الأولى للتعليقات فوراً
+    }
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.pixels >=
+        scrollController.position.maxScrollExtent - 200) {
+      if (!isLoadingMore.value && hasMore && postId != null) {
+        loadMoreComments(postId!);
+      }
+    }
+  }
+
   Future<void> fetchComments(int postId) async {
-    print("🔍 جاري جلب التعليقات للمنشور رقم: $postId");
+    print("🔍 جاري جلب الصفحة الأولى للتعليقات للمنشور رقم: $postId");
 
     try {
       isLoading(true);
-      final response = await _dio.get("/posts/$postId/comments");
+      currentPage = 1;
+      hasMore = true;
+      final response = await _dio.get(
+        "/posts/$postId/comments?page=$currentPage",
+      );
 
       if (response.statusCode == 200) {
-        // التصحيح هنا: الاستجابة أصبحت مقسمة لصفحات Paginated وتحتوي على مفتاح ['data']
         List<dynamic> commentsJson = response.data['data'];
 
         comments.value = commentsJson
             .map((e) => CommentModel.fromJson(e))
             .toList();
 
-        print("✅ تم جلب التعليقات وتفاعلاتها بطلب واحد فقط!");
+        if (response.data['next_page_url'] == null || commentsJson.isEmpty) {
+          hasMore = false;
+        }
+
+        print("✅ تم جلب الصفحة الأولى بنجاح!");
       }
     } catch (e) {
-      print("❌ خطأ: $e");
+      print("❌ خطأ في جلب التعليقات: $e");
     } finally {
       isLoading(false);
     }
   }
-  /*Future<void> fetchComments(int postId) async {
-    print("🔍 جاري جلب التعليقات للمنشور رقم: $postId");
+
+  Future<void> loadMoreComments(int postId) async {
+    if (isLoadingMore.value || !hasMore) return;
 
     try {
-      isLoading(true);
-      // comments.clear();
-      final response = await _dio.get("/posts/$postId/comments");
+      isLoadingMore(true);
+      currentPage++;
+
+      print("📄 جاري جلب الصفحة رقم: $currentPage");
+      final response = await _dio.get(
+        "/posts/$postId/comments?page=$currentPage",
+      );
 
       if (response.statusCode == 200) {
-        comments.value = (response.data as List)
+        List<dynamic> commentsJson = response.data['data'];
+
+        if (commentsJson.isEmpty || response.data['next_page_url'] == null) {
+          hasMore = false;
+        }
+
+        List<CommentModel> moreComments = commentsJson
             .map((e) => CommentModel.fromJson(e))
             .toList();
 
-        print("✅ تم جلب التعليقات وتفاعلاتها بطلب واحد فقط!");
+        comments.addAll(moreComments);
+        print("✅ تم إضافة المزيد من التعليقات بنجاح");
       }
     } catch (e) {
-      print("❌ خطأ: $e");
+      print("❌ خطأ في جلب المزيد: $e");
+      currentPage--;
     } finally {
-      isLoading(false);
+      isLoadingMore(false);
     }
-  }*/
+  }
+
+  void initScrollListener(int postId) {
+    scrollController.addListener(() {
+      if (scrollController.position.pixels >=
+          scrollController.position.maxScrollExtent - 200) {
+        if (!isLoadingMore.value && hasMore) {
+          loadMoreComments(postId);
+        }
+      }
+    });
+  }
 
   CommentModel? findCommentById(List<CommentModel> list, int id) {
     for (var comment in list) {
@@ -90,19 +173,22 @@ class CommentController extends GetxController {
         print(
           "✅ [CommentController] تم إضافة التعليق، الحالة: ${response.statusCode}",
         );
-        CommentModel newComment = CommentModel.fromJson(response.data);
-        comments.add(newComment);
+        final responseData = response.data['data'];
 
-        //     await fetchComments(postId);
+        CommentModel newComment = CommentModel.fromJson(responseData);
+        comments.insert(0, newComment);
+        try {
+          final JobController jobController = Get.find<JobController>();
+          var post = jobController.jobPosts.firstWhere((p) => p.id == postId);
+          post.commentsCount.value++;
+        } catch (e) {
+          print("⚠️ لم يتم العثور على المنشور لتحديث العداد محلياً: $e");
+        }
 
-        final JobController jobController = Get.find<JobController>();
-        var post = jobController.jobPosts.firstWhere((p) => p.id == postId);
-        post.commentsCount.value++;
-
-        print("✅ تم تحديث عداد التعليقات في المنشور الرئيسي");
+        print("✅ تم تحديث عداد التعليقات وعرضه بالواجهة");
       }
     } catch (e) {
-      print("❌ خطأ: $e");
+      print("❌ خطأ أثناء إضافة التعليق: $e");
     }
   }
 
@@ -129,30 +215,6 @@ class CommentController extends GetxController {
       print("❌ [CommentController: $tag] خطأ: $e");
     }
   }
-  /* Future<void> addReply(int postId, int parentId, String content) async {
-    try {
-      print("🚀 [CommentController] جاري إضافة رد للتعليق: $parentId...");
-      final response = await _dio.post(
-        "/posts/$postId/comments/reply",
-        data: {"content": content, "parent_id": parentId},
-      );
-      print("✅ [CommentController] تم إضافة الرد بنجاح، جاري تحديث القائمة");
-
-      // 1. جلب البيانات المحدثة من السيرفر
-      await fetchComments(postId);
-
-      // 2. استخدم دالة البحث الجديدة بدلاً من rootComments
-      var parent = findCommentById(comments, parentId);
-
-      // 3. تحديث الحالة (تأكد من وجود خاصية isExpanded في CommentModel)
-      if (parent != null) {
-        parent.isExpanded.value = true;
-        // comments.refresh();
-      }
-    } catch (e) {
-      print("❌ [CommentController] خطأ في إضافة الرد: $e");
-    }
-  }*/
 
   Future<void> updateComment(
     int commentId,
@@ -160,45 +222,23 @@ class CommentController extends GetxController {
     String newContent,
   ) async {
     try {
-      final response = await _dio.put(
-        "/comments/$commentId",
-        data: {"content": newContent},
+      final response = await DioService().dio.post(
+        '/comments/$commentId',
+        data: {'content': newContent},
       );
 
       if (response.statusCode == 200) {
-        int index = comments.indexWhere((c) => c.id == commentId);
-        if (index != -1) {
-          comments[index].content = newContent;
+        var targetComment = findCommentById(comments, commentId);
+        if (targetComment != null) {
+          targetComment.content = newContent;
           comments.refresh();
+          print("✅ تم تعديل التعليق/الرد وتحديث الواجهة محلياً");
         }
-        print("✅ تم تعديل التعليق محلياً");
       }
     } catch (e) {
       print("❌ خطأ: $e");
     }
   }
-  /* Future<void> updateComment(
-    int commentId,
-    int postId,
-    String newContent,
-  ) async {
-    try {
-      print(
-        "✏️ [CommentController] جاري تعديل التعليق (عبر POST): $commentId...",
-      );
-
-      // استخدمي .post فقط، لأن السيرفر يدعم POST فقط لهذا المسار
-      final response = await _dio.post(
-        "/comments/$commentId",
-        data: {"content": newContent},
-      );
-
-      print("✅ تم التعديل بنجاح: ${response.statusCode}");
-      await fetchComments(postId);
-    } catch (e) {
-      print("❌ خطأ: $e");
-    }
-  }*/
 
   Future<void> deleteComment(int commentId, int postId) async {
     try {
@@ -293,6 +333,23 @@ class CommentController extends GetxController {
       }
     } catch (e) {
       print("❌ خطأ: $e");
+    }
+  }
+
+  Future<void> fetchPublicProfile() async {
+    try {
+      final response = await DioService().dio.get('/profile/public');
+
+      if (response.statusCode == 200 && response.data != null) {
+        final userId = response.data['data']?['public_profile']?['user_id'];
+
+        if (userId != null) {
+          box.write("current_user_id", userId);
+          print("✅ [PublicProfile] تم حفظ الـ current_user_id بنجاح: $userId");
+        }
+      }
+    } catch (e) {
+      print("❌ خطأ أثناء جلب البروفايل العام: $e");
     }
   }
 }
