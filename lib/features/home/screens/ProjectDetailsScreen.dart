@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hobe/app_routes.dart';
 import 'package:hobe/core/theme/colors.dart';
+import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
 import 'package:hobe/features/home/controllers/ProjectDetailsController.dart';
+import 'package:hobe/features/home/screens/CompanyProfileScreen.dart';
 
 class ProjectDetailsScreen extends StatelessWidget {
   final ProjectDetailsController controller = Get.put(
@@ -12,7 +14,6 @@ class ProjectDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -287,6 +288,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                    // استبدل الـ Wrap القديم بهذا الكود:
                     if (proj.interests != null &&
                         proj.interests!.isNotEmpty) ...[
                       const SizedBox(height: 20),
@@ -302,21 +304,74 @@ class ProjectDetailsScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Wrap(
-                        spacing: 8.0,
-                        runSpacing: 4.0,
+                        spacing: 10.0,
+                        runSpacing: 10.0,
                         children: proj.interests!.map((interest) {
-                          return Chip(
-                            label: Text(
-                              interest['name'] ?? interest.toString(),
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
                             ),
-                            backgroundColor: AppColors.primaryStart.withOpacity(
-                              0.3,
-                            ),
-                            labelStyle: TextStyle(
+                            decoration: BoxDecoration(
                               color: isDarkMode
-                                  ? Colors.white
-                                  : AppColors.Selection,
-                              fontWeight: FontWeight.w600,
+                                  ? AppColors.darkCard.withOpacity(0.5)
+                                  : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: AppColors.primaryStart.withOpacity(0.3),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    //Get.to(
+                                    // () => CompanyProfileScreen(),
+                                    //   //          arguments: job.company!.id,
+                                    //   );
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      4.0,
+                                    ), // إضافة مساحة صغيرة للضغط
+                                    child: Text(
+                                      interest['company'] != null
+                                          ? interest['company']['company_name']
+                                          : 'شركة غير معروفة',
+                                      style: TextStyle(
+                                        // لون أزرق ليدل على أنه رابط
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.w600,
+                                        // وضع خط تحت النص ليعرف المستخدم أنه رابط
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                // زر القبول
+                                GestureDetector(
+                                  onTap: () =>
+                                      controller.acceptInterest(interest),
+                                  child: const Icon(
+                                    Icons.check_circle,
+                                    color: Colors.green,
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                // زر الرفض
+                                GestureDetector(
+                                  onTap: () =>
+                                      controller.rejectInterest(interest),
+                                  child: const Icon(
+                                    Icons.cancel,
+                                    color: Colors.red,
+                                    size: 22,
+                                  ),
+                                ),
+                              ],
                             ),
                           );
                         }).toList(),

@@ -54,7 +54,7 @@ class JobPostModel {
   RxnString reactionType;
   RxBool isSaved;
   RxBool isApplied;
-  final bool canApply;
+  RxBool canApply;
   final bool isOwner;
   final String? publishedSince;
   final String? expiresosIn;
@@ -85,7 +85,7 @@ class JobPostModel {
     String? reactionType,
     required bool isSaved,
     required bool isApplied,
-    required this.canApply,
+    required bool canApply,
     required this.isOwner,
     this.publishedSince,
     this.expiresosIn,
@@ -95,6 +95,7 @@ class JobPostModel {
        this.reactionType = RxnString(reactionType),
        this.isSaved = RxBool(isSaved),
        this.isApplied = isApplied.obs,
+       this.canApply = canApply.obs,
        this.reactionsCount = reactionsCount.obs,
        this.reactionIcons = reactionIcons.obs,
        commentsCount = count.obs;

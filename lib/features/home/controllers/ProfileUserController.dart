@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:hobe/features/APIS/api_constants.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
+import 'package:hobe/features/home/controllers/block_controller.dart';
 import 'package:hobe/features/home/models/ProfileUserModel.dart';
 
 class ProfileUserController extends GetxController {
@@ -25,6 +27,8 @@ class ProfileUserController extends GetxController {
       }
     }
   }
+
+  // داخل ملف block_controller.dar
 
   Future<void> fetchPublicProfile(int id) async {
     try {

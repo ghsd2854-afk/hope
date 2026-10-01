@@ -34,7 +34,7 @@ class HomeScreen extends StatelessWidget {
         body: IndexedStack(
           index: currentIndex,
           children: [
-            const MyApplicationsScreen(),
+            MyApplicationsScreen(),
             MainHomeContent(),
             MyProjectsScreen(),
           ],

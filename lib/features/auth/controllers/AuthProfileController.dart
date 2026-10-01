@@ -10,7 +10,7 @@ import 'package:hobe/features/auth/model/profile_model.dart';
 import 'package:hobe/features/auth/services/profile_services.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ProfileController extends GetxController {
+class AuthProfileController extends GetxController {
   final fullNameController = TextEditingController();
   final headlineController = TextEditingController();
   final summaryController = TextEditingController();

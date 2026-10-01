@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide FormData;
+import 'package:dio/dio.dart';
 import 'package:dio/dio.dart' as dio_pkg;
 import 'package:hobe/features/APIS/api_constants.dart';
 import 'package:hobe/features/APIS/dio_services.dart';
@@ -118,5 +119,65 @@ class ProjectDetailsController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  Future<void> respondToInterest(int interestId, String action) async {
+    try {
+      isLoading.value = true; // من الأفضل تفعيل حالة التحميل أيضاً هنا
+      FormData formData = FormData.fromMap({'action': action});
+
+      // استخدام الـ DioService الذي يحتوي على التوكن
+      final dioInstance = DioService().dio;
+
+      final response = await dioInstance.post(
+        ApiConstants.respondToInterest(
+          interestId,
+        ), // تأكد أن الرابط كامل أو تعامل معه بناءً على الـ BaseUrl في DioService
+        data: formData,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Get.snackbar(
+          "نجاح",
+          action == 'approve' ? "تم قبول الاهتمام بنجاح" : "تم رفض الاهتمام",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+
+        // تحديث البيانات بعد النجاح
+        fetchProjectDetails();
+      }
+    } on dio_pkg.DioException catch (e) {
+      // إضافة طباعة للخطأ لمعرفة سبب الرفض بالضبط من السيرفر
+      print("Error: ${e.response?.data}");
+
+      Get.snackbar(
+        "خطأ",
+        e.response?.data['message'] ?? "حدث خطأ أثناء الاتصال بالسيرفر",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } catch (e) {
+      print("General Error: $e");
+      Get.snackbar(
+        "خطأ",
+        "حدث خطأ غير متوقع",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  void acceptInterest(var interest) {
+    // افترض أن المفتاح هو id أو id_ الخاص بالاهتمام
+    var interestId = interest['id'];
+    respondToInterest(interestId, 'approve');
+  }
+
+  void rejectInterest(var interest) {
+    var interestId = interest['id'];
+    respondToInterest(interestId, 'reject');
   }
 }

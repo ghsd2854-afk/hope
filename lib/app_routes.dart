@@ -45,4 +45,5 @@ abstract class AppRoutes {
   static const String userProfile = '/user-profile';
   static const String userReviews = '/user-reviews';
   static const String notifications = '/notifications';
+  static const applyJobCv = "/apply-job-cv";
 }

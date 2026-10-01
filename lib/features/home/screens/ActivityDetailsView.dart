@@ -4,7 +4,7 @@ import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/Icons_home/controller/JobController.dart';
 import 'package:hobe/features/Icons_home/controller/ReactionController.dart';
 import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
-import 'package:hobe/features/home/screens/JobDetailsScreen.dart';
+import 'package:hobe/features/home/screens/JobDetailsActivityScreen%20.dart';
 import '../../home/controllers/home_controller.dart';
 
 class ActivityDetailsView extends StatelessWidget {

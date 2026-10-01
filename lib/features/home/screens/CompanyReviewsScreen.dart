@@ -3,9 +3,6 @@ import 'package:get/get.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/home/controllers/CompanyRatingController.dart';
 import 'package:hobe/features/home/models/CompanyReviewModel.dart';
-import 'package:hobe/features/home/screens/showCompanyRating.dart';
-// استبدل هذا المسار بالمسار الصحيح لشاشة إضافة التقييم لديك
-// import 'package:hobe/features/home/views/AddReviewScreen.dart';
 
 class CompanyReviewsScreen extends StatelessWidget {
   final int companyId;

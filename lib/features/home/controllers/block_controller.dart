@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 import 'package:hobe/features/home/models/block_model.dart';
-import 'package:hobe/features/home/services/block_service.dart' ;
+import 'package:hobe/features/home/services/block_service.dart';
+
 class BlockController extends GetxController {
   final BlockService _service = BlockService();
 
@@ -31,15 +32,15 @@ class BlockController extends GetxController {
     }
   }
 
-  Future<bool> checkIsBlocked({
-    required String type,
-    required int id,
-  }) async {
+  Future<bool> checkIsBlocked({required String type, required int id}) async {
     final key = _cacheKey(type, id);
     if (blockedStatusCache.containsKey(key)) {
       return blockedStatusCache[key]!;
     }
-    final result = await _service.isBlocked(blockableType: type, blockableId: id);
+    final result = await _service.isBlocked(
+      blockableType: type,
+      blockableId: id,
+    );
     blockedStatusCache[key] = result;
     return result;
   }
@@ -52,7 +53,10 @@ class BlockController extends GetxController {
     try {
       await _service.blockEntity(blockableType: type, blockableId: id);
       blockedStatusCache[_cacheKey(type, id)] = true;
-      Get.snackbar('تم الحظر', name != null ? 'تم حظر $name بنجاح' : 'تم الحظر بنجاح');
+      Get.snackbar(
+        'تم الحظر',
+        name != null ? 'تم حظر $name بنجاح' : 'تم الحظر بنجاح',
+      );
       fetchBlockedList();
     } catch (e) {
       Get.snackbar('خطأ', e.toString());
@@ -63,7 +67,8 @@ class BlockController extends GetxController {
     try {
       await _service.unblock(block.id);
       blockedList.removeWhere((b) => b.id == block.id);
-      blockedStatusCache[_cacheKey(block.blockableType, block.blockableId)] = false;
+      blockedStatusCache[_cacheKey(block.blockableType, block.blockableId)] =
+          false;
       Get.snackbar('تم', 'تم إلغاء الحظر بنجاح');
     } catch (e) {
       Get.snackbar('خطأ', e.toString());

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:hobe/app_routes.dart';
 import 'package:hobe/core/theme/colors.dart';
 import 'package:hobe/features/home/controllers/ProfileUserController.dart';
+import 'package:hobe/features/home/controllers/block_controller.dart';
 import 'package:hobe/features/home/models/ProfileUserModel.dart';
 import 'package:hobe/features/home/screens/ComplaintWidget.dart';
 
@@ -12,6 +13,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final BlockController blockController = Get.put(BlockController());
 
     return Obx(() {
       // 1. إذا كان الـ API لسه عم يحمل
@@ -123,7 +125,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                               Icons.more_vert,
                               color: isDarkMode ? Colors.white : Colors.black54,
                             ),
-                            onSelected: (value) {
+                            onSelected: (value) async {
                               if (value == 'complaint') {
                                 ComplaintUI.showComplaintDialog(
                                   context,
@@ -131,9 +133,63 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                                   'user',
                                   'شكوى على المستخدم',
                                 );
+                              } else if (value == 'block') {
+                                // 1. فتح نافذة التأكيد
+                                bool? confirm = await Get.dialog<bool>(
+                                  AlertDialog(
+                                    title: const Text('حظر المستخدم'),
+                                    content: Text(
+                                      'هل أنت متأكد من حظر ${user.name ?? "هذا المستخدم"}؟',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Get.back(
+                                          result: false,
+                                        ), // إغلاق فقط
+                                        child: const Text('إلغاء'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Get.back(
+                                          result: true,
+                                        ), // إرجاع القيمة true
+                                        child: const Text(
+                                          'حظر',
+                                          style: TextStyle(color: Colors.red),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                // 2. تنفيذ الحظر فقط إذا ضغط المستخدم "حظر"
+                                if (confirm == true) {
+                                  // تنفيذ عملية الحظر (بدون await لأنها void)
+                                  blockController.blockEntity(
+                                    type: 'user',
+                                    id: user.id,
+                                    name: user.name,
+                                  );
+
+                                  // 3. عرض رسالة النجاح بعد إغلاق الـ Dialog الأول
+                                  // نستخدم Future.microtask لضمان إغلاق النافذة الأولى تماماً قبل فتح الجديدة
+                                  Future.microtask(() {
+                                    Get.defaultDialog(
+                                      title: "تم الحظر",
+                                      middleText: "تم حظر المستخدم بنجاح",
+                                      barrierDismissible:
+                                          false, // لا يمكن إغلاقها إلا بالضغط على الزر
+                                      textConfirm: "موافق",
+                                      onConfirm: () {
+                                        Get.back(); // إغلاق نافذة النجاح
+                                        Get.back(); // إغلاق صفحة البروفايل (الرجوع للخلف)
+                                      },
+                                    );
+                                  });
+                                }
                               }
                             },
                             itemBuilder: (BuildContext context) => [
+                              // خيار الشكوى
                               const PopupMenuItem<String>(
                                 value: 'complaint',
                                 child: Row(
@@ -146,6 +202,24 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                                     SizedBox(width: 8),
                                     Text(
                                       'شكوى على المستخدم',
+                                      style: TextStyle(color: Colors.red),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // خيار الحظر
+                              const PopupMenuItem<String>(
+                                value: 'block',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.block,
+                                      color: Colors.red,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'حظر المستخدم',
                                       style: TextStyle(color: Colors.red),
                                     ),
                                   ],
@@ -207,7 +281,8 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
 
               const SizedBox(height: 16),
 
-              // 2. Stats Section
+              // 2. Stats Section (بقية الكود الخاص بك يكمل هنا...)
+              // (باقي الكود كما هو تماماً دون تغيير)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -233,10 +308,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // 3. Experiences Section
               if (profileData.experiences.isNotEmpty)
                 _buildSection(
                   context: context,
@@ -246,8 +318,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                       .map((exp) => _buildExperienceItem(context, exp))
                       .toList(),
                 ),
-
-              // 4. Educations Section
               if (profileData.educations.isNotEmpty)
                 _buildSection(
                   context: context,
@@ -257,8 +327,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                       .map((edu) => _buildEducationItem(context, edu))
                       .toList(),
                 ),
-
-              // 5. Skills Section
               if (profileData.skills.isNotEmpty)
                 _buildSection(
                   context: context,
@@ -286,8 +354,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                     ),
                   ],
                 ),
-
-              // 6. Projects Section
               if (profileData.projects.isNotEmpty)
                 _buildSection(
                   context: context,
@@ -297,24 +363,14 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                       .map((project) => _buildProjectItem(context, project))
                       .toList(),
                 ),
-
-              // 7. Reviews Section
-              // استدعاء قسم الـ Reviews مع إضافة زر الانتقال في الطرف الآخر
               if (profileData.reviews.isNotEmpty)
                 _buildSection(
                   context: context,
                   title: "Reviews",
                   icon: Icons.star,
-
-                  // زر عرض الكل في أقصى الطرف الآخر
                   trailingAction: TextButton(
-                    onPressed: () {
-                      // تأكد أن المتغير يمثل معرف المستخدم الصحيح (مثلاً user.id أو controller.userId)
-                      print(
-                        "Passing User ID: ${user.id}",
-                      ); // للتأكد عبر الـ Console من قيمته
-                      Get.toNamed(AppRoutes.userReviews, arguments: user.id);
-                    },
+                    onPressed: () =>
+                        Get.toNamed(AppRoutes.userReviews, arguments: user.id),
                     child: const Text(
                       "عرض الكل",
                       style: TextStyle(
@@ -324,13 +380,11 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                       ),
                     ),
                   ),
-
                   children: profileData.reviews
                       .take(2)
                       .map((review) => _buildReviewItem(context, review))
                       .toList(),
                 ),
-
               const SizedBox(height: 30),
             ],
           ),
@@ -344,7 +398,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     required String title,
     required IconData icon,
     required List<Widget> children,
-    Widget? trailingAction, // أضف هذا البارامتر الاختياري
+    Widget? trailingAction,
   }) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final cardColor = Theme.of(context).cardColor;
@@ -364,8 +418,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment
-                .spaceBetween, // لتوزيع الأيقونة والعنوان في طرف والزر في الطرف الآخر
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
@@ -381,8 +434,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
                   ),
                 ],
               ),
-              if (trailingAction != null)
-                trailingAction, // عرض الزر في أقصى الطرف المقابل إن وجد
+              if (trailingAction != null) trailingAction,
             ],
           ),
           Divider(
@@ -395,7 +447,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     );
   }
 
-  // Widget لإحصائيات المشاهدات
   Widget _buildStatCard(
     BuildContext context,
     String title,
@@ -423,7 +474,7 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
         ),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.primaryEnd, size: 20), // تم إزالة const
+            Icon(icon, color: AppColors.primaryEnd, size: 20),
             const SizedBox(height: 6),
             Text(
               value,
@@ -448,7 +499,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     );
   }
 
-  // عنصر الخبرة المهنية
   Widget _buildExperienceItem(BuildContext context, Experience exp) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode
@@ -534,7 +584,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     );
   }
 
-  // عنصر التعليم
   Widget _buildEducationItem(BuildContext context, Education edu) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode
@@ -573,7 +622,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     );
   }
 
-  // عنصر المشروع
   Widget _buildProjectItem(BuildContext context, Project project) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode
@@ -628,7 +676,6 @@ class ProfileUserScreen extends GetView<ProfileUserController> {
     );
   }
 
-  // عنصر التقييم
   Widget _buildReviewItem(BuildContext context, Review review) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDarkMode

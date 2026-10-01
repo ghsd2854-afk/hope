@@ -71,7 +71,7 @@ class CompanyProfileScreen extends StatelessWidget {
                   onPressed: () => Get.back(),
                 ),
                 actions: [
-                  PopupMenuButton<String>(
+                  /*  PopupMenuButton<String>(
                     icon: const Icon(
                       Icons.notifications_none,
                       color: Colors.white,
@@ -100,7 +100,7 @@ class CompanyProfileScreen extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ),
+                  ),*/
                 ],
                 flexibleSpace: FlexibleSpaceBar(
                   background: Stack(
@@ -255,7 +255,7 @@ class CompanyProfileScreen extends StatelessWidget {
                                   }),
                                 ),
                                 const SizedBox(width: 8),
-                                Expanded(
+                                /*Expanded(
                                   flex: 2,
                                   child: OutlinedButton.icon(
                                     onPressed: () {},
@@ -280,7 +280,7 @@ class CompanyProfileScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                ),
+                                ),*/
                                 const SizedBox(width: 8),
                                 Container(
                                   decoration: BoxDecoration(
@@ -882,6 +882,21 @@ class CompanyProfileScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showSuccessDialog(String title, String message) {
+    Get.defaultDialog(
+      title: title,
+      middleText: message,
+      textConfirm: "موافق",
+      confirmTextColor: Colors.white,
+      buttonColor: AppColors.primaryEnd,
+      onConfirm: () {
+        Get.back(); // لإغلاق نافذة الـ Dialog
+        Get.back(); // للرجوع للشاشة السابقة (التي قبل Profile)
+      },
+      barrierDismissible: false, // لمنع الإغلاق عند الضغط خارج النافذة
     );
   }
 

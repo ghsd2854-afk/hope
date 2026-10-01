@@ -13,10 +13,7 @@ class BlockService {
   }) async {
     final response = await _dio.post(
       ApiConstants.blocks, // ⚠️ ضيف: static const String blocks = "/blocks";
-      data: {
-        'blockable_type': blockableType,
-        'blockable_id': blockableId,
-      },
+      data: {'blockable_type': blockableType, 'blockable_id': blockableId},
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
@@ -30,11 +27,9 @@ class BlockService {
     required int blockableId,
   }) async {
     final response = await _dio.post(
-      ApiConstants.checkBlock, // ⚠️ ضيف: static const String checkBlock = "/blocks/check";
-      data: {
-        'blockable_type': blockableType,
-        'blockable_id': blockableId,
-      },
+      ApiConstants
+          .checkBlock, // ⚠️ ضيف: static const String checkBlock = "/blocks/check";
+      data: {'blockable_type': blockableType, 'blockable_id': blockableId},
     );
 
     if (response.statusCode == 200) {

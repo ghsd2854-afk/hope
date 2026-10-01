@@ -1,12 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'package:hobe/features/onboarding/onboarding_controller.dart';
-import 'package:hobe/features/profiles/controller/profile_controller.dart';
 import 'package:hobe/features/auth/widgets/custum_input.dart';
 import 'package:hobe/features/auth/widgets/gradient_button.dart';
+import 'package:hobe/features/profiles/controller/profile_controller.dart';
 
 class ProfileEditScreen extends StatelessWidget {
   /// isOnboarding = true  -> الشاشة مضمنة جوا فلو التسجيل الأول (Onboarding)
@@ -31,10 +29,7 @@ class ProfileEditScreen extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFFDCCBFF),
-              Color(0xFFF8F7FF),
-            ],
+            colors: [Color(0xFFDCCBFF), Color(0xFFF8F7FF)],
           ),
         ),
         child: SafeArea(
@@ -45,8 +40,6 @@ class ProfileEditScreen extends StatelessWidget {
               children: [
                 _buildHeader(),
                 const SizedBox(height: 20),
-
-               
 
                 _buildAvatarCard(),
                 const SizedBox(height: 20),
@@ -82,7 +75,10 @@ class ProfileEditScreen extends StatelessWidget {
         if (!isOnboarding)
           IconButton(
             onPressed: () => Get.back(),
-            icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF7C3AED)),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Color(0xFF7C3AED),
+            ),
           )
         else
           const SizedBox(width: 4),
@@ -100,8 +96,6 @@ class ProfileEditScreen extends StatelessWidget {
     );
   }
 
-
-
   // -------------------- Avatar + اسم/هيدلاين + أيقونات تعديل/حذف صغيرة --------------------
   Widget _buildAvatarCard() {
     return _Card(
@@ -113,12 +107,14 @@ class ProfileEditScreen extends StatelessWidget {
                 children: [
                   Obx(() {
                     final File? localImage = controller.imageFile.value;
-                    final String? networkImage = controller.profile.value?.profileImage;
+                    final String? networkImage =
+                        controller.profile.value?.profileImage;
 
                     ImageProvider? avatarImage;
                     if (localImage != null) {
                       avatarImage = FileImage(localImage);
-                    } else if (networkImage != null && networkImage.trim().isNotEmpty) {
+                    } else if (networkImage != null &&
+                        networkImage.trim().isNotEmpty) {
                       avatarImage = NetworkImage(networkImage);
                     }
 
@@ -129,14 +125,20 @@ class ProfileEditScreen extends StatelessWidget {
                         height: 100,
                         decoration: const BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: LinearGradient(colors: [Color(0xFF9F67FF), Color(0xFF7C3AED)]),
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF9F67FF), Color(0xFF7C3AED)],
+                          ),
                         ),
                         padding: const EdgeInsets.all(4),
                         child: CircleAvatar(
                           backgroundColor: Colors.white,
                           backgroundImage: avatarImage,
                           child: avatarImage == null
-                              ? const Icon(Icons.camera_alt, size: 32, color: Color(0xFF7C3AED))
+                              ? const Icon(
+                                  Icons.camera_alt,
+                                  size: 32,
+                                  color: Color(0xFF7C3AED),
+                                )
                               : null,
                         ),
                       ),
@@ -147,8 +149,15 @@ class ProfileEditScreen extends StatelessWidget {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0xFF7C3AED)),
-                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 14),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFF7C3AED),
+                      ),
+                      child: const Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
+                        size: 14,
+                      ),
                     ),
                   ),
                 ],
@@ -159,15 +168,25 @@ class ProfileEditScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      controller.fullNameController.text.isEmpty ? "اسمك الكامل" : controller.fullNameController.text,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      controller.fullNameController.text.isEmpty
+                          ? "اسمك الكامل"
+                          : controller.fullNameController.text,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      controller.headlineController.text.isEmpty ? "المسمى الوظيفي" : controller.headlineController.text,
-                      style: const TextStyle(color: Color(0xFF7C3AED), fontWeight: FontWeight.w600),
+                      controller.headlineController.text.isEmpty
+                          ? "المسمى الوظيفي"
+                          : controller.headlineController.text,
+                      style: const TextStyle(
+                        color: Color(0xFF7C3AED),
+                        fontWeight: FontWeight.w600,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -177,7 +196,10 @@ class ProfileEditScreen extends StatelessWidget {
                         controller.summaryController.text,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13, color: Colors.black54),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.black54,
+                        ),
                       ),
                     ],
                   ],
@@ -224,25 +246,64 @@ class ProfileEditScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(icon: Icons.person_outline, title: "Personal Information"),
+          const _SectionTitle(
+            icon: Icons.person_outline,
+            title: "Personal Information",
+          ),
           const SizedBox(height: 16),
-          CustomInput(hint: "Full Name", icon: Icons.person, controller: controller.fullNameController),
+          CustomInput(
+            hint: "Full Name",
+            icon: Icons.person,
+            controller: controller.fullNameController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Headline", icon: Icons.work, controller: controller.headlineController),
+          CustomInput(
+            hint: "Headline",
+            icon: Icons.work,
+            controller: controller.headlineController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Summary", icon: Icons.description, controller: controller.summaryController),
+          CustomInput(
+            hint: "Summary",
+            icon: Icons.description,
+            controller: controller.summaryController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Gender", icon: Icons.people, controller: controller.genderController),
+          CustomInput(
+            hint: "Gender",
+            icon: Icons.people,
+            controller: controller.genderController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Phone", icon: Icons.phone, controller: controller.phoneController),
+          CustomInput(
+            hint: "Phone",
+            icon: Icons.phone,
+            controller: controller.phoneController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Address", icon: Icons.location_on, controller: controller.addressController),
+          CustomInput(
+            hint: "Address",
+            icon: Icons.location_on,
+            controller: controller.addressController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Birth Date", icon: Icons.calendar_month, controller: controller.birthDateController),
+          CustomInput(
+            hint: "Birth Date",
+            icon: Icons.calendar_month,
+            controller: controller.birthDateController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Country", icon: Icons.flag, controller: controller.countryController),
+          CustomInput(
+            hint: "Country",
+            icon: Icons.flag,
+            controller: controller.countryController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "City", icon: Icons.location_city, controller: controller.cityController),
+          CustomInput(
+            hint: "City",
+            icon: Icons.location_city,
+            controller: controller.cityController,
+          ),
         ],
       ),
     );
@@ -256,11 +317,23 @@ class ProfileEditScreen extends StatelessWidget {
         children: [
           const _SectionTitle(icon: Icons.link, title: "Links"),
           const SizedBox(height: 16),
-          CustomInput(hint: "LinkedIn", icon: Icons.link, controller: controller.linkedinController),
+          CustomInput(
+            hint: "LinkedIn",
+            icon: Icons.link,
+            controller: controller.linkedinController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "GitHub", icon: Icons.code, controller: controller.githubController),
+          CustomInput(
+            hint: "GitHub",
+            icon: Icons.code,
+            controller: controller.githubController,
+          ),
           const SizedBox(height: 10),
-          CustomInput(hint: "Portfolio", icon: Icons.web, controller: controller.portfolioController),
+          CustomInput(
+            hint: "Portfolio",
+            icon: Icons.web,
+            controller: controller.portfolioController,
+          ),
         ],
       ),
     );
@@ -342,7 +415,10 @@ class ProfileEditScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _SectionTitle(icon: Icons.dashboard_outlined, title: "أقسام البروفايل"),
+          const _SectionTitle(
+            icon: Icons.dashboard_outlined,
+            title: "أقسام البروفايل",
+          ),
           const SizedBox(height: 10),
           ...sections.map(
             (s) => ListTile(
@@ -374,7 +450,11 @@ class _Card extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 12, offset: Offset(0, 4)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 12,
+            offset: Offset(0, 4),
+          ),
         ],
       ),
       child: child,
@@ -393,7 +473,10 @@ class _SectionTitle extends StatelessWidget {
       children: [
         Icon(icon, color: const Color(0xFF7C3AED)),
         const SizedBox(width: 10),
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -435,12 +518,22 @@ class _SmallIconAction extends StatelessWidget {
               child: loading
                   ? Padding(
                       padding: const EdgeInsets.all(10),
-                      child: CircularProgressIndicator(strokeWidth: 2, color: color),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: color,
+                      ),
                     )
                   : Icon(icon, color: color, size: 20),
             ),
             const SizedBox(height: 4),
-            Text(label, style: TextStyle(fontSize: 11, color: color, fontWeight: FontWeight.w600)),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: color,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
       ),

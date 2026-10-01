@@ -18,13 +18,11 @@ class ActivityModel {
     String contentDesc = '';
     String type = json['type'] ?? '';
 
-    // التحقق بناءً على الـ type القادم من الـ API
     if (type == 'reaction') {
       contentTitle = "تفاعل";
       var meta = json['meta'];
       if (meta is Map && meta.containsKey('type')) {
-        contentDesc = meta['type']
-            .toString(); // يجلب نوع التفاعل مثل love أو support
+        contentDesc = meta['type'].toString();
       } else {
         contentDesc = 'love';
       }
@@ -32,8 +30,7 @@ class ActivityModel {
       contentTitle = "تعليق";
       var meta = json['meta'];
       if (meta is Map && meta.containsKey('content')) {
-        contentDesc = meta['content']
-            .toString(); // يجلب نص التعليق مثل "حلووحلووو"
+        contentDesc = meta['content'].toString();
       } else {
         contentDesc = json['comment']?.toString() ?? '';
       }

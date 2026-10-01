@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:hobe/Notification/controller/NotificationController.dart';
+import 'package:hobe/Notification/screen/NotificationDetailsScreen.dart';
 import 'package:hobe/core/theme/colors.dart';
 
 class NotificationScreen extends StatelessWidget {
@@ -127,6 +128,10 @@ class NotificationScreen extends StatelessWidget {
                 onTap: () {
                   // عند الضغط عليه نجعله مقروءاً ونحدث البيانات
                   controller.markAsRead(notification.id);
+                  // 2. الانتقال إلى صفحة تفاصيل الإشعار مع تمرير بيانات الإشعار
+                  Get.to(
+                    () => NotificationDetailsScreen(notification: notification),
+                  );
                 },
               ),
             );

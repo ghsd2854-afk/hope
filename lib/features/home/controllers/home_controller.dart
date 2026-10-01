@@ -5,7 +5,7 @@ import 'package:hobe/features/APIS/dio_services.dart';
 import 'package:hobe/features/Icons_home/models/CategoryModel.dart';
 import 'package:hobe/features/Icons_home/models/JobPostModel.dart';
 import 'package:hobe/features/Icons_home/models/post_model.dart';
-import 'package:hobe/features/auth/controllers/profile_controller.dart';
+import 'package:hobe/features/auth/controllers/AuthProfileController.dart';
 import 'package:hobe/features/home/models/ActivityModel.dart';
 
 class HomeController extends GetxController {
@@ -34,7 +34,7 @@ class HomeController extends GetxController {
     notificationController.fetchUnreadCount();
     //  fetchCategories();
     fetchCategories();
-    Get.put(ProfileController()).getProfile();
+    Get.put(AuthProfileController()).getProfile();
   }
 
   Future<void> fetchCategories() async {

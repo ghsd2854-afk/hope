@@ -16,6 +16,8 @@ import 'package:hobe/features/home/controllers/MyApplicationsController.dart';
 import 'package:hobe/features/home/controllers/MyProjectsController.dart'; // <--- Controller الخاص بمشاريعك
 import 'package:hobe/features/home/controllers/ProfileUserController.dart';
 import 'package:hobe/features/home/controllers/UserReviewsController.dart';
+import 'package:hobe/features/home/screens/CompanyProfileScreen.dart';
+import 'package:hobe/features/home/screens/CvFileScreen.dart';
 import 'package:hobe/features/home/screens/MyActivities.dart';
 import 'package:hobe/features/home/screens/MyApplicationsScreen.dart';
 import 'package:hobe/features/home/screens/MyProjectsScreen.dart'; // <--- شاشتك الخاصة بمشاريعي
@@ -174,7 +176,7 @@ class AppPages {
     GetPage(name: AppRoutes.myActivities, page: () => const MyActivities()),
     GetPage(
       name: AppRoutes.myApplications,
-      page: () => const MyApplicationsScreen(),
+      page: () => MyApplicationsScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut<MyApplicationsController>(() => MyApplicationsController());
       }),
@@ -203,6 +205,18 @@ class AppPages {
       page: () => const NotificationScreen(),
       binding: BindingsBuilder(() {
         Get.lazyPut<NotificationController>(() => NotificationController());
+      }),
+    ),
+    // أضيفي هذا داخل مصفوفة الـ pages
+    GetPage(
+      name: AppRoutes.applyJobCv, // المسار الجديد
+      page: () => const CvFileScreen(), // الشاشة التي تريدين عرضها
+      binding: BindingsBuilder(() {
+        if (!Get.isRegistered<MyApplicationsController>()) {
+          Get.lazyPut<MyApplicationsController>(
+            () => MyApplicationsController(),
+          );
+        }
       }),
     ),
   ];
